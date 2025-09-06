@@ -1,5 +1,8 @@
+import CalculateNutrition from '@/components/CalculateNutrition'
 import DaisyThemeWrapper from '@/components/DaisyThemeWrapper'
 import MealTable from '@/components/MealTable'
+import { Button } from '@/components/ui/button'
+import React from 'react'
 
 export default function Home() {
   return (
@@ -20,7 +23,9 @@ export default function Home() {
         </div>
       </div> */}
       <MealTable />
-      <MealSection />
+      <CalculateNutrition />
+
+      {/* <MealSection /> */}
     </DaisyThemeWrapper>
   )
   // return (

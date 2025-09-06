@@ -61,15 +61,18 @@ export default function MealTable({ mealName = 'Breakfast' }) {
     'border-input bg-background text-foreground focus:ring-primary/50 w-full rounded-md border px-2 py-1 text-center text-sm focus:ring-2 focus:outline-none'
 
   return (
-    <div className="bg-base-200 w-full overflow-scroll rounded-md p-4">
+    <div className="bg-base-200 overflow-x-auto rounded-md p-4">
       <h2 className="mb-2 text-lg font-semibold">{mealName}</h2>
       <Table className="w-full table-fixed">
         <TableHeader>
           <TableRow>
             <TableHead className="w-[150px]">Food</TableHead>
-            <TableHead className="w-[100px]">Amount</TableHead>
-            <TableHead className="text-primary w-[75px] text-center">Calories</TableHead>
-            <TableHead className="text-accent w-[75px] text-center">Protein</TableHead>
+            <TableHead className="w-[150px]">Amount</TableHead>
+            {/* ✅ Merge Calories + Protein */}
+            <TableHead className="text-center">
+              <span className="text-primary">Calories</span> /{' '}
+              <span className="text-accent">Protein</span>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -121,15 +124,33 @@ function GroupedTableRows({ group, unit, selectItems, handleChange }) {
           <TableCell>
             <div className="custom-container">
               <Input
-                type="text"
+                type="number"
                 value={row.value}
                 disableFocus={true}
                 onChange={(e) =>
                   handleChange({ id: row.id, field: 'value', value: e.target.value })
                 }
                 placeholder="0"
-                className="text-center"
+                className="h-[90%] p-0 text-center shadow-none"
               />
+
+              <Select
+                className="w-full"
+                defaultValue={row.unit}
+                onValueChange={(value) => handleChange({ id: row.id, field: 'unit', value })}
+              >
+                <SelectTrigger className="bg-base-200/50 border-none">
+                  <SelectValue placeholder="Select unit" />
+                  {/* <SelectValue placeholder="Select unit" /> */}
+                </SelectTrigger>
+                <SelectContent>
+                  {selectItems?.map((unit) => (
+                    <SelectItem key={unit} value={unit}>
+                      {unit}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </TableCell>
           {/* ✅ Combined Calories + Protein */}
@@ -138,16 +159,8 @@ function GroupedTableRows({ group, unit, selectItems, handleChange }) {
             <span className="text-muted-foreground mx-1">|</span>
             <span className="text-accent">{row.protein}g</span>
           </TableCell> */}
-          <TableCell className="text-primary max-w-[50px] text-center leading-tight">
-            {row.calories}
-            <br />
-            <span className="text-muted-foreground/40 text-xs">kcal</span>
-          </TableCell>
-          <TableCell className="text-accent text-center leading-tight">
-            {row.protein}
-            <br />
-            <span className="text-muted-foreground/40 text-xs">grams</span>
-          </TableCell>
+          <TableCell className="text-primary max-w-[50px] text-center">{row.calories}</TableCell>
+          <TableCell className="text-accent text-center">{row.protein}g</TableCell>
         </TableRow>
       ))}
     </>

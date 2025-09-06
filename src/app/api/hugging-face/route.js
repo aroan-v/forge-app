@@ -1,32 +1,30 @@
-// app/api/huggingface/route.js (App Router example)
+import { InferenceClient } from '@huggingface/inference'
 
 export async function POST(req) {
   try {
-    const body = await req.json()
+    const { mealData } = await req.json()
 
-    // Grab the user's prompt from the request
-    const { prompt } = body
+    const client = new InferenceClient(process.env.HF_TOKEN)
 
-    console.log('HF Token loaded:', process.env.HF_TOKEN ? '✅ yes' : '❌ no')
+    console.log('rawRequest', mealData)
+    console.log('jsonStringified', JSON.stringify(mealData))
 
-    // Call Hugging Face Inference API
-    const response = await fetch(
-      'https://api-inference.huggingface.co/models/google/flan-t5-small', // example model
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.HF_TOKEN}`, // safe server-side usage
-          'Content-Type': 'application/json',
+    const result = await client.chatCompletion({
+      model: 'moonshotai/Kimi-K2-Instruct-0905',
+      provider: 'groq',
+      messages: [
+        {
+          role: 'user',
+          content: `Compute calories and protein for this meal list:\n${JSON.stringify(mealData)}`,
         },
-        body: JSON.stringify({ inputs: prompt }),
-      }
-    )
-
-    const result = await response.json()
+      ],
+      temperature: 0.5,
+      top_p: 0.7,
+    })
 
     return new Response(JSON.stringify(result), { status: 200 })
-  } catch (error) {
-    console.error('HF API Error:', error)
-    return new Response(JSON.stringify({ error: 'Something went wrong' }), { status: 500 })
+  } catch (err) {
+    console.error('HF API Error:', err)
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
   }
 }
