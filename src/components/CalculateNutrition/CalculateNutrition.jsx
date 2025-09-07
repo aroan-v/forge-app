@@ -4,56 +4,65 @@ import { Button } from '../ui/button'
 import { sampleRawData } from '@/app/schemas/foodSchema'
 import { useFoodStore } from '@/app/store/useFoodStore'
 import SimpleCard from '../SimpleCard'
-
 function CalculateNutrition() {
-  const [content, setContent] = React.useState('')
-  const setFoodBank = useFoodStore((s) => s.setFoodBank)
-  const foodBank = useFoodStore((s) => s.foodBank)
-  const fetchNutrition = async (food) => {
-    const res = await fetch('/api/hugging-face', {
-      method: 'POST',
-      body: JSON.stringify({ mealData: sampleRawData }),
-    })
-    const data = await res.json()
+  const [content, setContent] = React.useState('') // holds any messages to show in UI
+  const [isLoading, setIsLoading] = React.useState(false) // tracks loading state
 
-    console.log(data.choices[0].message.content)
-    setContent(data.choices[0].message.content)
-  }
+  const getUnregisteredFoods = useFoodStore((s) => s.getUnregisteredFoods)
+  const updateLoggedFoodWithNutrition = useFoodStore((s) => s.updateLoggedFoodWithNutrition)
 
-  console.log('foodBank', foodBank)
+  const unregisteredFoods = getUnregisteredFoods() // collect unregistered foods
 
-  const sample = {
-    egg: {
-      serving: 'piece',
-      quantity: 1,
-      calories: 75,
-      protein: 6,
-    },
-    rice: {
-      serving: 'cup',
-      quantity: 1,
-      calories: 200,
-      protein: 4,
-    },
-    chickenBreast: {
-      serving: 'gram',
-      quantity: 100,
-      calories: 165,
-      protein: 31,
-    },
+  const fetchNutrition = async () => {
+    // set loading state true before API call
+    setIsLoading(true)
+    setContent(
+      `Getting data for ${Object.keys(unregisteredFoods)
+        ?.map((food) => food)
+        .join(', ')}`
+    )
+
+    try {
+      const res = await fetch('/api/hugging-face', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(unregisteredFoods), // pass foods to backend
+      })
+
+      const data = await res.json()
+      const rawContent = data.choices[0].message.content
+
+      let parsedContent
+      try {
+        parsedContent = JSON.parse(rawContent) // parse AI JSON response
+      } catch (e) {
+        console.error('Failed to parse JSON from model:', rawContent)
+        parsedContent = null
+      }
+
+      if (parsedContent) {
+        updateLoggedFoodWithNutrition(parsedContent)
+        setContent('Nutrition data updated successfully ✅')
+      } else {
+        setContent('⚠️ Failed to parse nutrition data')
+      }
+    } catch (err) {
+      console.error(err)
+      setContent('❌ Error fetching nutrition data')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <>
-      <Button onClick={() => fetchNutrition(sampleRawData)}>Calculate Nutrition</Button>
-      <div>{JSON.stringify(content)}</div>
+    <div className="space-y-4">
+      <Button onClick={fetchNutrition} disabled={isLoading}>
+        {isLoading ? 'Calculating…' : 'Calculate Nutrition'}
+      </Button>
 
-      <SimpleCard>
-        <Button onClick={() => setFoodBank(sample)}>Calculate Nutrition</Button>
-        Food Bank
-        {JSON.stringify(foodBank)}
-      </SimpleCard>
-    </>
+      {isLoading && <p className="text-sm text-gray-500">{content}</p>}
+      {!isLoading && content && <p className="text-sm font-medium">{content}</p>}
+    </div>
   )
 }
 

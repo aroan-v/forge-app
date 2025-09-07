@@ -1,10 +1,14 @@
+'use client'
 import CalculateNutrition from '@/components/CalculateNutrition'
 import DaisyThemeWrapper from '@/components/DaisyThemeWrapper'
 import MealTable from '@/components/MealTable'
 import { Button } from '@/components/ui/button'
 import React from 'react'
+import { useFoodStore } from './store/useFoodStore'
 
 export default function Home() {
+  const loggedFood = useFoodStore((s) => s.loggedFood)
+
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
@@ -22,7 +26,9 @@ export default function Home() {
           </div>
         </div>
       </div> */}
-      <MealTable />
+      {loggedFood.map(({ name, id, meals }) => (
+        <MealTable key={id} mealName={name} meals={meals} groupId={id} />
+      ))}
       <CalculateNutrition />
 
       {/* <MealSection /> */}

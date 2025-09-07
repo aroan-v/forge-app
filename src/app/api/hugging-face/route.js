@@ -2,20 +2,28 @@ import { InferenceClient } from '@huggingface/inference'
 
 export async function POST(req) {
   try {
-    const { mealData } = await req.json()
+    const body = await req.json()
 
     const client = new InferenceClient(process.env.HF_TOKEN)
 
-    console.log('rawRequest', mealData)
-    console.log('jsonStringified', JSON.stringify(mealData))
+    // Debugging logs
+    console.log('rawRequest', body)
+    console.log('jsonStringified', JSON.stringify(body))
 
     const result = await client.chatCompletion({
       model: 'moonshotai/Kimi-K2-Instruct-0905',
       provider: 'groq',
       messages: [
         {
+          role: 'system',
+          content: `You are a nutrition assistant. 
+          Always return JSON with the same keys given.
+          Insert two extra properties into each object: "calories" and "protein". 
+          Do not add text outside of JSON.`,
+        },
+        {
           role: 'user',
-          content: `Compute calories and protein for this meal list:\n${JSON.stringify(mealData)}`,
+          content: JSON.stringify(body), // body = your unregisteredFoods object
         },
       ],
       temperature: 0.5,
