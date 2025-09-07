@@ -27,8 +27,10 @@ import {
 import { UNITS, UNIT_TYPES, sampleData, templateData } from '@/app/schemas/foodSchema'
 import { useFoodStore } from '@/app/store/useFoodStore'
 import { Textarea } from '../ui/textarea'
+import { cn } from '@/lib/utils'
 
 export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
+  console.log({ meals })
   // Declare the initial meals to the local state
   const [rows, setRows] = useState(meals)
   const [deleteMode, setDeleteMode] = useState(false)
@@ -112,22 +114,29 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
 
       <motion.div layout className="mt-4 flex justify-center gap-2">
         {deleteMode ? (
-          <Button
-            variant="destructiveOutline"
-            size="sm"
-            onClick={() => {
-              setDeleteMode(false)
-              deleteMealRow({ groupId, foodIds: deleteIds })
-            }}
-          >
-            <Trash2 color="#d11f1f" />
-          </Button>
+          <>
+            <Button
+              disabled={deleteIds.length === 0}
+              variant="destructiveOutline"
+              size="sm"
+              onClick={() => {
+                setDeleteMode(false)
+                setDeleteIds([])
+                deleteMealRow({ groupId, foodIds: deleteIds })
+              }}
+            >
+              <Trash2 /> Delete
+            </Button>
+            <Button size="sm" variant="defaultOutline" onClick={() => setDeleteMode(false)}>
+              Cancel
+            </Button>
+          </>
         ) : (
           <>
             <Button onClick={() => addMealRow(groupId)} size="sm" variant="defaultOutline">
               Add Row
             </Button>
-            <Button onClick={() => setDeleteMode((p) => !p)} size="sm" variant="destructiveOutline">
+            <Button onClick={() => setDeleteMode(true)} size="sm" variant="destructiveOutline">
               Delete Row
             </Button>
           </>
@@ -196,20 +205,26 @@ function GroupedTableRows({
                 className="text-center"
               /> */}
 
-              <Textarea
-                disabled={deleteMode} // disables editing when delete mode is active
-                value={row.food ?? ''} // current food name value
-                onChange={(e) =>
-                  updateLoggedFoodName({ groupId, foodId: row.id, foodName: e.target.value })
-                }
-                placeholder="Food"
-                className="resize-none" // centers text & removes resize handle
-              />
+              <div
+                className={cn('text-area-bg', {
+                  disabled: deleteMode || row.calories || row.protein,
+                })}
+              >
+                <Textarea
+                  disabled={deleteMode || row.calories || row.protein}
+                  value={row.food ?? ''} // current food name value
+                  onChange={(e) =>
+                    updateLoggedFoodName({ groupId, foodId: row.id, foodName: e.target.value })
+                  }
+                  placeholder="Food"
+                  className="resize-none" // centers text & removes resize handle
+                />
+              </div>
             </TableCell>
             <TableCell>
               <div className="custom-container">
                 <Input
-                  disabled={deleteMode}
+                  disabled={deleteMode || row.calories || row.protein}
                   type="text"
                   value={row.displayValue ?? ''}
                   disableFocus={true}

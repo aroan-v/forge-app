@@ -22,10 +22,12 @@ function Textarea({ className, ...props }) {
 
         // Focus and transitions
         'transition-[color,box-shadow] outline-none',
-        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+        // 'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+
+        'ring-0 outline-none focus:ring-0 focus:outline-none',
 
         // Disabled state
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'disabled:cursor-not-allowed disabled:opacity-95 disabled:dark:bg-transparent',
 
         // Invalid state
         'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
