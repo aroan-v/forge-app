@@ -57,7 +57,7 @@ export const useFoodStore = create(
           food: null,
           value: 0,
           unit: '',
-          id: crypto.randomUUID(),
+          id: Date.now().toString(36) + Math.random().toString(36).substring(2, 10),
         })
       })
     },
@@ -153,27 +153,19 @@ export const useFoodStore = create(
         })
       }),
 
-    deleteMealRow: ({ groupId, foodId }) => {
+    deleteMealRow: ({ groupId, foodIds }) => {
       set((state) => {
         // Find the target group by groupId
         const targetGroup = state.loggedFood.find((g) => g.id === groupId)
 
         if (targetGroup) {
-          // Find index of the meal with matching foodId
-          const mealIndex = targetGroup.meals.findIndex((meal) => meal.id === foodId)
-
-          if (mealIndex !== -1) {
-            // Mutate directly with splice (Immer tracks this safely)
-            targetGroup.meals.splice(mealIndex, 1)
-          } else {
-            console.warn(`No meal found with id ${foodId} in group ${groupId}`)
-          }
+          // ✅ Filter out all meals whose IDs are in foodIds
+          targetGroup.meals = targetGroup.meals.filter((meal) => !foodIds.includes(meal.id))
         } else {
           console.warn(`No group found with id ${groupId}`)
         }
       })
     },
-
     setFoodBank: (foodObject) =>
       set((prev) => {
         // guard clause: only allow non-null objects

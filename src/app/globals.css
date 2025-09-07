@@ -180,6 +180,41 @@
   }
 }
 
+.text-area-custom {
+  border-color: var(--ds-input-color);
+  min-height: var(--ds-size);
+  box-shadow:
+    0 1px color-mix(in oklab, var(--ds-input-color) calc(var(--depth) * 10%), #0000) inset,
+    0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+  --ds-size: calc(var(--size-field, 0.25rem /* 4px */) * 10);
+  --ds-input-color: color-mix(
+    in oklab,
+    var(--color-base-content) /* var(--color-base-content) */ 20%,
+    #0000
+  );
+
+  &:has(> input[disabled]),
+  &:is(:disabled, [disabled]),
+  fieldset:disabled & {
+    cursor: not-allowed;
+    border-color: var(--color-base-200) /* var(--color-base-200) */;
+    background-color: var(--color-base-200) /* var(--color-base-200) */;
+    color: color-mix(
+      in oklab,
+      var(--color-base-content) /* var(--color-base-content) */ 40%,
+      transparent
+    );
+    &::placeholder {
+      color: color-mix(
+        in oklab,
+        var(--color-base-content) /* var(--color-base-content) */ 20%,
+        transparent
+      );
+    }
+    box-shadow: none;
+  }
+}
+
 .custom-container {
   cursor: text; /* optional — can remove if not needed */
   border: var(--border) solid #0000;

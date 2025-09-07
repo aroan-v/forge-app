@@ -16,10 +16,18 @@ export async function POST(req) {
       messages: [
         {
           role: 'system',
-          content: `You are a nutrition assistant. 
-          Always return JSON with the same keys given.
-          Insert two extra properties into each object: "calories" and "protein". 
-          Do not add text outside of JSON.`,
+          content: `
+          You are a nutrition assistant.
+          Always return JSON ONLY, without any text outside of the JSON.
+          Each object must contain the same keys provided in the input,
+          PLUS two additional properties: "calories" and "protein".
+          
+          If the input is not recognized as food or is invalid, ignore it silently 
+          (do not include it in the output JSON).
+          
+          Do NOT invent extra fields, explanations, or commentary.
+          JSON must be valid and parsable.
+        `,
         },
         {
           role: 'user',

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { motion } from 'framer-motion'
 
 import { cn } from '@/lib/utils'
 
@@ -15,14 +16,50 @@ function Table({ className, ...props }) {
     </div>
   )
 }
+function MotionTable({ className, ...props }) {
+  return (
+    <motion.div
+      // layout={true}
+      data-slot="table-container"
+      className="relative w-full overflow-x-auto"
+    >
+      <table
+        data-slot="table"
+        className={cn('w-full caption-bottom text-sm', className)}
+        {...props}
+      />
+    </motion.div>
+  )
+}
 
 function TableHeader({ className, ...props }) {
   return <thead data-slot="table-header" className={cn('[&_tr]:border-b', className)} {...props} />
+}
+function MotionTableHeader({ className, ...props }) {
+  return (
+    <motion.thead
+      layout="size"
+      data-slot="table-header"
+      className={cn('[&_tr]:border-b', className)}
+      {...props}
+    />
+  )
 }
 
 function TableBody({ className, ...props }) {
   return (
     <tbody
+      data-slot="table-body"
+      className={cn('[&_tr:last-child]:border-0', className)}
+      {...props}
+    />
+  )
+}
+
+function MotionTableBody({ className, ...props }) {
+  return (
+    <motion.tbody
+      layout="size"
       data-slot="table-body"
       className={cn('[&_tr:last-child]:border-0', className)}
       {...props}
@@ -43,6 +80,25 @@ function TableFooter({ className, ...props }) {
 function TableRow({ className, ...props }) {
   return (
     <tr
+      data-slot="table-row"
+      className={cn(
+        'hover:bg-muted/50 data-[state=selected]:bg-muted border-base-300 w-full border-b transition-colors',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function MotionTableRow({ motionId, className, ...props }) {
+  return (
+    <motion.tr
+      key={motionId}
+      layout
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      // exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
       data-slot="table-row"
       className={cn(
         'hover:bg-muted/50 data-[state=selected]:bg-muted border-base-300 w-full border-b transition-colors',
@@ -89,4 +145,17 @@ function TableCaption({ className, ...props }) {
   )
 }
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption }
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  MotionTableRow,
+  MotionTableBody,
+  TableFooter,
+  MotionTableHeader,
+  MotionTable,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+}
