@@ -85,6 +85,15 @@ export const useFoodStore = create(
       return foodWithoutNutrition
     },
 
+    updateGroupName: ({ groupId, groupName }) =>
+      set((state) => {
+        const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
+
+        if (targetGroup) {
+          targetGroup.name = groupName
+        }
+      }),
+
     updateLoggedFoodName: ({ groupId, foodId, foodName, displayValue }) =>
       set((state) => {
         const targetGroup = state.loggedFood.find(({ id }) => id === groupId)

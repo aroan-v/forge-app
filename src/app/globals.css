@@ -219,6 +219,19 @@
   }
 }
 
+.custom-ds-input {
+  &:has(> input[disabled]),
+  &:is(:disabled, [disabled]),
+  fieldset:disabled & {
+    cursor: auto;
+    color: color-mix(
+      in oklab,
+      var(--color-base-content) /* var(--color-base-content) */ 100%,
+      transparent
+    );
+  }
+}
+
 .custom-container {
   cursor: text; /* optional — can remove if not needed */
   border: var(--border) solid #0000;

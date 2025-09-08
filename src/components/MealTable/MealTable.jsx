@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '../ui/input'
-import { CircleX, Trash2 } from 'lucide-react'
+import { CircleX, SquarePen, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import {
@@ -30,13 +30,25 @@ import { Textarea } from '../ui/textarea'
 import { cn } from '@/lib/utils'
 
 export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
-  console.log({ meals })
   // Declare the initial meals to the local state
   const [rows, setRows] = useState(meals)
   const [deleteMode, setDeleteMode] = useState(false)
   const [deleteIds, setDeleteIds] = useState([])
   const addMealRow = useFoodStore((s) => s.addMealRow)
   const deleteMealRow = useFoodStore((s) => s.deleteMealRow)
+  const updateGroupName = useFoodStore((s) => s.updateGroupName)
+
+  const [localMealName, setLocalMealName] = useState(mealName)
+  const [isEditing, setIsEditing] = useState(false)
+
+  const handleToggle = () => {
+    if (isEditing) {
+      // save logic can go here if needed
+      console.log('Saved:', localMealName)
+      updateGroupName({ groupId, groupName: localMealName })
+    }
+    setIsEditing(!isEditing)
+  }
 
   function toggleDeleteId(rowId, checked) {
     setDeleteIds((prev) => (checked ? [...prev, rowId] : prev.filter((id) => id !== rowId)))
@@ -73,9 +85,19 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
       layout="size"
       className="bg-base-200 w-full max-w-xl overflow-scroll rounded-md p-4"
     >
-      <motion.h2 layout className="mb-2 text-lg font-semibold">
-        {mealName}
-      </motion.h2>
+      <motion.div layout="size" className="mb-2 flex items-stretch gap-2 p-2 align-middle">
+        <Input
+          value={localMealName}
+          placeholder="Meal name"
+          onChange={(e) => setLocalMealName(e.target.value)}
+          disabled={!isEditing}
+          className={`custom-ds-input flex-1 text-lg font-semibold`}
+        />
+
+        <Button variant="defaultOutline" size="stretch" onClick={handleToggle}>
+          {isEditing ? 'Save' : <SquarePen />}
+        </Button>
+      </motion.div>
       <MotionTable className="w-full table-fixed">
         <MotionTableHeader>
           <MotionTableRow>
