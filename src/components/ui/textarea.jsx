@@ -7,24 +7,21 @@ function Textarea({ className, ...props }) {
     <textarea
       data-slot="textarea"
       className={cn(
-        // Base classes and custom component name
-        'text-area-custom text-center',
-        'flex w-full',
+        // Base classes
+        'w-full',
 
-        // Sizing and layout
-        'field-sizing-content px-3 py-2',
+        // Sizing and Spacing
+        'h-auto min-h-[1.2em] resize-none overflow-auto px-3 py-2',
 
-        // Borders, background, and shadows
+        // Borders and Appearance
         'rounded-md bg-transparent shadow-xs',
+        'dark:bg-base-100', // This class would need custom dark mode configuration
 
         // Typography
-        'placeholder:text-muted-foreground/30 text-base md:text-sm',
+        'placeholder:text-muted-foreground/30 text-center text-base leading-[1.2] md:text-sm',
 
-        // Focus and transitions
+        // Focus and Transition
         'transition-[color,box-shadow] outline-none',
-        // 'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-
-        'ring-0 outline-none focus:ring-0 focus:outline-none',
 
         // Disabled state
         'disabled:cursor-not-allowed disabled:opacity-95 disabled:dark:bg-transparent',
@@ -32,9 +29,6 @@ function Textarea({ className, ...props }) {
         // Invalid state
         'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
         'dark:aria-invalid:ring-destructive/40',
-
-        // Dark mode specific styles
-        'dark:bg-base-100',
 
         className
       )}

@@ -71,7 +71,7 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
       animate={{ height: 'auto' }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
       layout="size"
-      className="bg-base-200 w-full overflow-scroll rounded-md p-4"
+      className="bg-base-200 w-full max-w-xl overflow-scroll rounded-md p-4"
     >
       <motion.h2 layout className="mb-2 text-lg font-semibold">
         {mealName}
@@ -120,7 +120,7 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
               variant="destructiveOutline"
               size="sm"
               onClick={() => {
-                setDeleteMode(false)
+                setTimeout(() => setDeleteMode(false), 500)
                 setDeleteIds([])
                 deleteMealRow({ groupId, foodIds: deleteIds })
               }}
@@ -180,7 +180,7 @@ function GroupedTableRows({
 
   return (
     <>
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence>
         {group?.map((row, index) => (
           <MotionTableRow motionId={row.id} key={row.id} className="hover:bg-accent/10">
             {deleteMode && (
@@ -222,6 +222,29 @@ function GroupedTableRows({
               </div>
             </TableCell>
             <TableCell>
+              <div
+                className={cn('text-area-bg', {
+                  disabled: deleteMode || row.calories || row.protein,
+                })}
+              >
+                <Textarea
+                  disabled={deleteMode || row.calories || row.protein}
+                  value={row.displayValue ?? ''} // current food name value
+                  onChange={(e) =>
+                    updateLoggedFoodAmount({
+                      groupId,
+                      foodId: row.id,
+                      displayValue: e.target.value,
+                    })
+                  }
+                  onBlur={(e) =>
+                    checkUnit({ groupId, foodId: row.id, displayValue: e.target.value })
+                  }
+                  placeholder="0"
+                  className="resize-none text-center" // centers text & removes resize handle
+                />
+              </div>
+              {/* 
               <div className="custom-container">
                 <Input
                   disabled={deleteMode || row.calories || row.protein}
@@ -241,7 +264,7 @@ function GroupedTableRows({
                   placeholder="0"
                   className="text-center"
                 />
-              </div>
+              </div> */}
             </TableCell>
             {/* ✅ Combined Calories + Protein */}
             {/* <TableCell className="text-right">

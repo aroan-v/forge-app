@@ -19,8 +19,9 @@ function Table({ className, ...props }) {
 function MotionTable({ className, ...props }) {
   return (
     <motion.div
-      // layout={true}
+      layout="size"
       data-slot="table-container"
+      transition={{ duration: 0.25 }}
       className="relative w-full overflow-x-auto"
     >
       <table
@@ -94,10 +95,9 @@ function MotionTableRow({ motionId, className, ...props }) {
   return (
     <motion.tr
       key={motionId}
-      layout
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      // exit={{ opacity: 0 }}
+      layout="position"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
       data-slot="table-row"
       className={cn(
@@ -111,7 +111,8 @@ function MotionTableRow({ motionId, className, ...props }) {
 
 function TableHead({ className, ...props }) {
   return (
-    <th
+    <motion.th
+      layout
       data-slot="table-head"
       className={cn(
         'text-neutral-content h-10 px-2 text-center align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
@@ -124,7 +125,8 @@ function TableHead({ className, ...props }) {
 
 function TableCell({ className, ...props }) {
   return (
-    <td
+    <motion.td
+      layout
       data-slot="table-cell"
       className={cn(
         'p-2 text-center align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
