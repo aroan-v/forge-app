@@ -61,28 +61,23 @@ export const useFoodStore = create(
         })
       })
     },
-
     getUnregisteredFoods: () => {
       const currentState = get()
       const foodWithoutNutrition = {}
 
-      currentState.loggedFood.forEach(({ meals, id }) => {
+      currentState.loggedFood.forEach(({ meals, id: groupId }) => {
         meals.forEach((foodObj) => {
-          const { food, unit, displayValue, protein, calories } = foodObj
+          const { food, id: foodId, displayValue, protein, calories } = foodObj
 
-          // ✅ must have food + displayValue
-          // ✅ must NOT already have protein & calories
-          if (food && displayValue && (protein == null || calories == null)) {
-            if (!foodWithoutNutrition[food]) {
-              foodWithoutNutrition[food] = []
+          if (food && foodId && displayValue && (protein == null || calories == null)) {
+            if (!foodWithoutNutrition[groupId]) {
+              foodWithoutNutrition[groupId] = {}
             }
 
-            foodWithoutNutrition[food].push({
+            foodWithoutNutrition[groupId][foodId] = {
               food,
-              unit,
-              value: displayValue,
-              groupId: id,
-            })
+              displayValue,
+            }
           }
         })
       })
@@ -132,21 +127,17 @@ export const useFoodStore = create(
 
     updateLoggedFoodWithNutrition: (nutritionData) =>
       set((state) => {
-        // Loop through loggedFood
-
-        console.log('recieved nutrition data', nutritionData)
+        console.log('received nutrition data', nutritionData)
 
         state.loggedFood.forEach((groupMeal) => {
-          groupMeal.meals.forEach((food) => {
-            // See if Hugging Face returned nutrition for this meal's food
-            const enrichedArray = nutritionData[food.food]
-            if (!enrichedArray) return
+          const enrichedGroup = nutritionData[groupMeal.id]
+          if (!enrichedGroup) return
 
-            // Match by groupId
-            const enriched = enrichedArray.find((f) => f.groupId === groupMeal.id)
+          groupMeal.meals.forEach((food) => {
+            const enriched = enrichedGroup[food.id]
             if (!enriched) return
 
-            // ✅ Mutate meal directly (Immer makes this safe)
+            // ✅ Safe to mutate via Immer
             food.calories = Number(enriched.calories)
             food.protein = Number(enriched.protein)
           })
