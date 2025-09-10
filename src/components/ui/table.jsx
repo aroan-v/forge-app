@@ -38,12 +38,7 @@ function TableHeader({ className, ...props }) {
 }
 function MotionTableHeader({ className, ...props }) {
   return (
-    <motion.thead
-      layout="size"
-      data-slot="table-header"
-      className={cn('[&_tr]:border-b', className)}
-      {...props}
-    />
+    <motion.thead layout="size" data-slot="table-header" className={cn('', className)} {...props} />
   )
 }
 
@@ -62,7 +57,7 @@ function MotionTableBody({ className, ...props }) {
     <motion.tbody
       layout="size"
       data-slot="table-body"
-      className={cn('[&_tr:last-child]:border-0', className)}
+      className={cn('border [&_tr:last-child]:border-0', className)}
       {...props}
     />
   )
@@ -82,10 +77,7 @@ function TableRow({ className, ...props }) {
   return (
     <tr
       data-slot="table-row"
-      className={cn(
-        'hover:bg-muted/50 data-[state=selected]:bg-muted border-base-300 w-full border-b transition-colors',
-        className
-      )}
+      className={cn('data-[state=selected]:bg-muted w-full transition-colors', className)}
       {...props}
     />
   )
@@ -100,10 +92,7 @@ function MotionTableRow({ motionId, className, ...props }) {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
       data-slot="table-row"
-      className={cn(
-        'hover:bg-muted/50 data-[state=selected]:bg-muted border-base-300 w-full border-b transition-colors',
-        className
-      )}
+      className={cn('data-[state=selected]:bg-muted w-full transition-colors', className)}
       {...props}
     />
   )
@@ -115,7 +104,7 @@ function TableHead({ className, ...props }) {
       layout
       data-slot="table-head"
       className={cn(
-        'text-neutral-content h-10 px-2 text-center align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
+        'text-neutral-content bg-neutral/20 h-10 px-2 text-center align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
         className
       )}
       {...props}

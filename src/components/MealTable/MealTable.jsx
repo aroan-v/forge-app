@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   Table,
   TableBody,
@@ -12,10 +12,11 @@ import {
   MotionTable,
   MotionTableHeader,
 } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
+import { Button, MotionButton } from '@/components/ui/button'
 import { Input } from '../ui/input'
 import { CircleX, SquarePen, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { motionTransition } from '@/constants/constants'
 
 import {
   Select,
@@ -24,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import SettingsAction from '../SettingsAction'
 import { UNITS, UNIT_TYPES, sampleData, templateData } from '@/app/schemas/foodSchema'
 import { useFoodStore } from '@/app/store/useFoodStore'
 import { Textarea } from '../ui/textarea'
@@ -39,16 +41,28 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
   const updateGroupName = useFoodStore((s) => s.updateGroupName)
 
   const [localMealName, setLocalMealName] = useState(mealName)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditingHeader, setIsEditingHeader] = useState(false)
 
   const handleToggle = () => {
-    if (isEditing) {
+    if (isEditingHeader) {
       // save logic can go here if needed
       console.log('Saved:', localMealName)
       updateGroupName({ groupId, groupName: localMealName })
     }
-    setIsEditing(!isEditing)
+    setIsEditingHeader(!isEditingHeader)
   }
+
+  const deleteFoodGroup = useFoodStore((s) => s.deleteFoodGroup)
+
+  const inputRef = useRef(null)
+  useEffect(() => {
+    if (isEditingHeader && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+        inputRef.current?.select() // optional: select text for easier editing
+      }, 500) // 50-100ms usually works
+    }
+  }, [isEditingHeader])
 
   function toggleDeleteId(rowId, checked) {
     setDeleteIds((prev) => (checked ? [...prev, rowId] : prev.filter((id) => id !== rowId)))
@@ -82,33 +96,65 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
     <motion.div
       animate={{ height: 'auto' }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
-      layout="size"
-      className="bg-base-200 w-full max-w-xl overflow-scroll rounded-md p-4"
+      layout
+      className="bg-base-200 relative w-full max-w-xl overflow-scroll rounded-md p-4"
     >
-      <motion.div layout="size" className="mb-2 flex items-stretch gap-2 p-2 align-middle">
+      <motion.div layout className="absolute top-6 right-2 -translate-y-1/2">
+        <SettingsAction
+          onEdit={() => setIsEditingHeader(true)}
+          onDelete={() => deleteFoodGroup(groupId)}
+        />
+      </motion.div>
+      <motion.div layout="size" className="mb-2 flex w-[95%] gap-4 p-2 align-middle">
         <Input
-          value={localMealName}
-          placeholder="Meal name"
+          value={localMealName ?? ''}
+          placeholder="Food Group"
           onChange={(e) => setLocalMealName(e.target.value)}
-          disabled={!isEditing}
-          className={`custom-ds-input flex-1 text-lg font-semibold`}
+          onBlur={() => setIsEditingHeader(false)}
+          ref={inputRef}
+          disabled={!isEditingHeader}
+          className={`custom-ds-input flex-1 text-lg font-semibold ${!localMealName && 'italic'}`}
         />
 
-        <Button variant="defaultOutline" size="stretch" onClick={handleToggle}>
-          {isEditing ? 'Save' : <SquarePen />}
-        </Button>
+        {/* {isEditingHeader && (
+          <Button variant="defaultOutline" size="stretch" onClick={handleToggle}>
+            Save
+          </Button>
+        )} */}
+
+        <AnimatePresence mode="wait">
+          {isEditingHeader && (
+            <MotionButton
+              key="save-btn"
+              initial={{ opacity: 0, y: 8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              transition={motionTransition}
+              variant="defaultOutline"
+              size="stretch"
+              onClick={handleToggle}
+            >
+              Save
+            </MotionButton>
+          )}
+        </AnimatePresence>
       </motion.div>
       <MotionTable className="w-full table-fixed">
         <MotionTableHeader>
           <MotionTableRow>
-            {deleteMode && <TableHead className="w-[30px]"></TableHead>}
+            {deleteMode && (
+              <TableHead className="text-destructive/80 w-[30px]">
+                <Trash2 size={16} />
+              </TableHead>
+            )}
             <TableHead className="w-[150px]">Food</TableHead>
             <TableHead className="w-[100px]">Amount</TableHead>
             <TableHead className="text-primary w-[75px] text-center">Calories</TableHead>
             <TableHead className="text-accent w-[75px] text-center">Protein</TableHead>
           </MotionTableRow>
         </MotionTableHeader>
-        <MotionTableBody>
+
+        <TableBody>
           <GroupedTableRows
             group={meals}
             selectItems={[...UNITS.weight, ...UNITS.quantity]}
@@ -120,7 +166,7 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
           />
 
           {/* ✅ Running total row */}
-          <TableRow className="bg-muted/20 font-semibold">
+          <MotionTableRow className="bg-muted/20 font-semibold">
             <TableCell></TableCell>
             {deleteMode && <TableCell></TableCell>}
             <TableCell className="text-center"></TableCell>
@@ -130,11 +176,11 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
             <TableCell className="text-center">
               <span className="text-accent">{totalProtein}g</span>
             </TableCell>
-          </TableRow>
-        </MotionTableBody>
+          </MotionTableRow>
+        </TableBody>
       </MotionTable>
 
-      <motion.div layout className="mt-4 flex justify-center gap-2">
+      <div className="mt-4 flex justify-center gap-2">
         {deleteMode ? (
           <>
             <Button
@@ -142,7 +188,7 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
               variant="destructiveOutline"
               size="sm"
               onClick={() => {
-                setTimeout(() => setDeleteMode(false), 500)
+                setTimeout(() => setDeleteMode(false), 1000)
                 setDeleteIds([])
                 deleteMealRow({ groupId, foodIds: deleteIds })
               }}
@@ -150,20 +196,30 @@ export default function MealTable({ mealName = 'Breakfast', meals, groupId }) {
               <Trash2 /> Delete
             </Button>
             <Button size="sm" variant="defaultOutline" onClick={() => setDeleteMode(false)}>
-              Cancel
+              Cancel Delete Rows
             </Button>
           </>
         ) : (
           <>
-            <Button onClick={() => addMealRow(groupId)} size="sm" variant="defaultOutline">
+            <Button
+              disabled={meals.length >= 10}
+              onClick={() => addMealRow(groupId)}
+              size="sm"
+              variant="defaultOutline"
+            >
               Add Row
             </Button>
-            <Button onClick={() => setDeleteMode(true)} size="sm" variant="destructiveOutline">
+            <Button
+              disabled={meals.length <= 1}
+              onClick={() => setDeleteMode(true)}
+              size="sm"
+              variant="destructiveOutline"
+            >
               Delete Row
             </Button>
           </>
         )}
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -204,7 +260,11 @@ function GroupedTableRows({
     <>
       <AnimatePresence>
         {group?.map((row, index) => (
-          <MotionTableRow motionId={row.id} key={row.id} className="hover:bg-accent/10">
+          <MotionTableRow
+            motionId={row.id}
+            key={row.id}
+            className={cn(index % 2 === 0 ? 'bg-base-100/20' : '')}
+          >
             {deleteMode && (
               <TableCell>
                 <input
@@ -216,17 +276,6 @@ function GroupedTableRows({
               </TableCell>
             )}
             <TableCell>
-              {/* <Input
-                disabled={deleteMode}
-                type="text"
-                value={row.food ?? ''}
-                onChange={(e) =>
-                  updateLoggedFoodName({ groupId, foodId: row.id, foodName: e.target.value })
-                }
-                placeholder="Food"
-                className="text-center"
-              /> */}
-
               <div
                 className={cn('text-area-bg', {
                   disabled: deleteMode || row.calories || row.protein,
@@ -266,34 +315,7 @@ function GroupedTableRows({
                   className="resize-none text-center" // centers text & removes resize handle
                 />
               </div>
-              {/* 
-              <div className="custom-container">
-                <Input
-                  disabled={deleteMode || row.calories || row.protein}
-                  type="text"
-                  value={row.displayValue ?? ''}
-                  disableFocus={true}
-                  onChange={(e) =>
-                    updateLoggedFoodAmount({
-                      groupId,
-                      foodId: row.id,
-                      displayValue: e.target.value,
-                    })
-                  }
-                  onBlur={(e) =>
-                    checkUnit({ groupId, foodId: row.id, displayValue: e.target.value })
-                  }
-                  placeholder="0"
-                  className="text-center"
-                />
-              </div> */}
             </TableCell>
-            {/* ✅ Combined Calories + Protein */}
-            {/* <TableCell className="text-right">
-            <span className="text-primary">{row.calories} kcal</span>
-            <span className="text-muted-foreground mx-1">|</span>
-            <span className="text-accent">{row.protein}g</span>
-          </TableCell> */}
             <TableCell className="text-primary max-w-[50px] text-center leading-tight">
               {row.calories ?? '-'}
               <br />

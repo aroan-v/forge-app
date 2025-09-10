@@ -1,6 +1,7 @@
 import { PcCase } from 'lucide-react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+import { nanoid } from 'nanoid'
 
 export const useFoodStore = create(
   immer((set, get) => ({
@@ -49,6 +50,27 @@ export const useFoodStore = create(
     ],
     foodBank: {},
 
+    addFoodGroup: () =>
+      set((state) => {
+        state.loggedFood.push({
+          name: null,
+          id: nanoid(), // or use Date.now(), whatever you prefer
+          meals: [
+            {
+              food: null,
+              value: 0,
+              unit: '',
+              id: nanoid(),
+            },
+          ],
+        })
+      }),
+
+    deleteFoodGroup: (groupId) =>
+      set((state) => {
+        state.loggedFood = state.loggedFood.filter(({ id }) => id !== groupId)
+      }),
+
     addMealRow: (targetId) => {
       set((state) => {
         const targetGroup = state.loggedFood.find(({ id }) => id === targetId)
@@ -57,10 +79,25 @@ export const useFoodStore = create(
           food: null,
           value: 0,
           unit: '',
-          id: Date.now().toString(36) + Math.random().toString(36).substring(2, 10),
+          id: nanoid(),
         })
       })
     },
+
+    deleteMealRow: ({ groupId, foodIds }) => {
+      set((state) => {
+        // Find the target group by groupId
+        const targetGroup = state.loggedFood.find((g) => g.id === groupId)
+
+        if (targetGroup) {
+          // ✅ Filter out all meals whose IDs are in foodIds
+          targetGroup.meals = targetGroup.meals.filter((meal) => !foodIds.includes(meal.id))
+        } else {
+          console.warn(`No group found with id ${groupId}`)
+        }
+      })
+    },
+
     getUnregisteredFoods: () => {
       const currentState = get()
       const foodWithoutNutrition = {}
@@ -153,19 +190,6 @@ export const useFoodStore = create(
         })
       }),
 
-    deleteMealRow: ({ groupId, foodIds }) => {
-      set((state) => {
-        // Find the target group by groupId
-        const targetGroup = state.loggedFood.find((g) => g.id === groupId)
-
-        if (targetGroup) {
-          // ✅ Filter out all meals whose IDs are in foodIds
-          targetGroup.meals = targetGroup.meals.filter((meal) => !foodIds.includes(meal.id))
-        } else {
-          console.warn(`No group found with id ${groupId}`)
-        }
-      })
-    },
     setFoodBank: (foodObject) =>
       set((prev) => {
         // guard clause: only allow non-null objects
@@ -245,47 +269,5 @@ export const useFoodStore = create(
           foodBank: newFoodBank,
         }
       }),
-
-    //   isLoading: true,
-    //   combinedData: null,
-    //   combinedDelta: null,
-    //   dailySnapshots: {},
-    //   selectedDate: snapshotDates.at(-1) || null,
-    //   finalSnapshot: null,
-    //   selectedDelta: () => {
-    //     const state = get()
-    //     if (!state.selectedDate) {
-    //       return null
-    //     }
-    //     return state.dailySnapshots[state.selectedDate]?.combinedDelta || null
-    //   },
-    //   selectedGapMovement: () => {
-    //     const state = get()
-    //     if (!state.selectedDate) {
-    //       return null
-    //     }
-    //     return state.dailySnapshots[state.selectedDate]?.gapMovement || null
-    //   },
-    //   selectedCombinedData: () => {
-    //     const state = get()
-    //     if (!state.selectedDate) {
-    //       return null
-    //     }
-    //     return state.dailySnapshots[state.selectedDate]?.combinedData || null
-    //   },
-    //   // State setter
-    //   setApiState: (newState) => set(newState),
-    //   setDailySnapshot: ({ date, times, gapMovement, combinedDelta, combinedData }) =>
-    //     set((state) => ({
-    //       dailySnapshots: {
-    //         ...state.dailySnapshots,
-    //         [date]: {
-    //           times,
-    //           gapMovement,
-    //           combinedDelta,
-    //           combinedData,
-    //         },
-    //       },
-    //     })),
   }))
 )

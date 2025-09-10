@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva } from 'class-variance-authority'
+import { motion } from 'framer-motion'
 
 import { cn } from '@/lib/utils'
 const buttonVariants = cva(
@@ -10,8 +11,19 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-muted text-muted-foreground shadow-xs hover:bg-muted/90',
-        destructive:
-          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
+        destructive: cn(
+          // Base appearance
+          'bg-destructive text-destructive-foreground shadow-sm',
+
+          // Hover & active
+          'hover:bg-destructive/80 active:bg-destructive/60',
+
+          // Focus ring
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-destructive/40 dark:focus-visible:ring-destructive/50',
+
+          // Disabled
+          'disabled:opacity-50 disabled:pointer-events-none'
+        ),
         outline:
           'border border-border bg-background text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
         secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
@@ -19,7 +31,7 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
 
         // New color-specific outline variants
-        defaultOutline: 'border border-muted text-muted-foreground hover:bg-muted/90',
+        defaultOutline: 'border border-muted/50 text-muted-foreground hover:bg-muted/70',
         primaryOutline:
           'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
         secondaryOutline:
@@ -27,7 +39,7 @@ const buttonVariants = cva(
         accentOutline:
           'border border-accent text-accent hover:bg-accent hover:text-accent-foreground',
         destructiveOutline:
-          'border border-destructive/50 text-destructive/80 hover:bg-destructive/50 hover:text-destructive-foreground',
+          'border border-destructive/50 text-destructive/90 hover:bg-destructive/50 hover:text-destructive-foreground',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
@@ -56,4 +68,6 @@ function Button({ className, variant, size, asChild = false, ...props }) {
   )
 }
 
-export { Button, buttonVariants }
+const MotionButton = motion(Button)
+
+export { Button, buttonVariants, MotionButton }

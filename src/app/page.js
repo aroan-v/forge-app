@@ -8,32 +8,24 @@ import { useFoodStore } from './store/useFoodStore'
 
 export default function Home() {
   const loggedFood = useFoodStore((s) => s.loggedFood)
+  const addFoodGroup = useFoodStore((s) => s.addFoodGroup)
 
   console.log('loggedFood', loggedFood)
 
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
-      {/* <div id="daisy-scope" className="hero min-h-screen">
-        <div className="hero-content text-center">
-          <div className="max-w-md">
-            <h1 className="text-5xl font-bold">Hello there</h1>
-            <p className="py-6">
-              Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi
-              exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.
-            </p>
-            <Button>
-              <Link href="/setup">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </div> */}
+
       {loggedFood.map(({ name, id, meals }) => (
         <MealTable key={id} mealName={name} meals={meals} groupId={id} />
       ))}
+
       <CalculateNutrition />
 
-      {/* <MealSection /> */}
+      {/* ✅ New Group Button */}
+      <Button variant="default" onClick={addFoodGroup}>
+        + Add New Group
+      </Button>
     </DaisyThemeWrapper>
   )
 }
