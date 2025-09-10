@@ -278,11 +278,11 @@ function GroupedTableRows({
             <TableCell>
               <div
                 className={cn('text-area-bg', {
-                  disabled: deleteMode || row.calories || row.protein,
+                  disabled: deleteMode || row.calories != null || row.protein != null,
                 })}
               >
                 <Textarea
-                  disabled={deleteMode || row.calories || row.protein}
+                  disabled={deleteMode || row.calories != null || row.protein != null}
                   value={row.food ?? ''} // current food name value
                   onChange={(e) =>
                     updateLoggedFoodName({ groupId, foodId: row.id, foodName: e.target.value })
@@ -295,11 +295,11 @@ function GroupedTableRows({
             <TableCell>
               <div
                 className={cn('text-area-bg', {
-                  disabled: deleteMode || row.calories || row.protein,
+                  disabled: deleteMode || row.calories != null || row.protein != null,
                 })}
               >
                 <Textarea
-                  disabled={deleteMode || row.calories || row.protein}
+                  disabled={deleteMode || row.calories != null || row.protein != null}
                   value={row.displayValue ?? ''} // current food name value
                   onChange={(e) =>
                     updateLoggedFoodAmount({
