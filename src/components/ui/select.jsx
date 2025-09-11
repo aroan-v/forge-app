@@ -67,21 +67,11 @@ function SelectContent({ className, children, position = 'popper', ...props }) {
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          // 🎨 Colors
-          'bg-popover text-popover-foreground',
+          // 🎨 Colors & Appearance (match dropdown)
+          'bg-popover text-popover-foreground border-base-300',
 
-          // 🎞️ Animations & transitions
-          'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          'data-[side=bottom]:slide-in-from-top-2',
-          'data-[side=left]:slide-in-from-right-2',
-          'data-[side=right]:slide-in-from-left-2',
-          'data-[side=top]:slide-in-from-bottom-2',
-
-          // 📐 Positioning & z-index
-          'relative z-50',
-          'origin-(--radix-select-content-transform-origin)',
+          // 🟦 Border & Radius
+          'rounded-md border-2 shadow-md',
 
           // 📏 Sizing
           'min-w-[8rem]',
@@ -90,14 +80,22 @@ function SelectContent({ className, children, position = 'popper', ...props }) {
           // 📜 Overflow handling
           'overflow-x-hidden overflow-y-auto',
 
-          // 🟦 Border & radius
-          'rounded-md border shadow-md',
+          // 🎞️ Animations & transitions (Radix states)
+          'data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
 
-          // 📍 Popper-specific positioning adjustments
+          // 📍 Positioning & Popper adjustments
+          'relative z-50',
+          'origin-(--radix-select-content-transform-origin)',
+          'data-[side=bottom]:slide-in-from-top-2',
+          'data-[side=left]:slide-in-from-right-2',
+          'data-[side=right]:slide-in-from-left-2',
+          'data-[side=top]:slide-in-from-bottom-2',
           position === 'popper' &&
             'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
 
-          // 🔗 External className
+          // 🔗 External override
           className
         )}
         position={position}
@@ -134,7 +132,34 @@ function SelectItem({ className, children, ...props }) {
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        [
+          // Position & Layout
+          'relative flex w-full items-center gap-2',
+          'cursor-default outline-hidden select-none',
+
+          // Spacing
+          'py-1.5 pr-8 pl-2',
+
+          // Typography
+          'text-sm',
+
+          // Shape
+          'rounded-sm',
+
+          // State: Focus
+          'focus:bg-neutral/30 focus:text-neutral-foreground',
+
+          // State: Disabled
+          'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+
+          // Child: SVG
+          '[&_svg]:pointer-events-none [&_svg]:shrink-0',
+          "[&_svg:not([class*='size-'])]:size-4",
+          "[&_svg:not([class*='text-'])]:text-muted-foreground",
+
+          // Child: Last span adjustments
+          '*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2',
+        ],
         className
       )}
       {...props}

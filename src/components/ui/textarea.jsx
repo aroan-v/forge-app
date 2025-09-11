@@ -11,7 +11,8 @@ function Textarea({ className, ...props }) {
         'w-full',
 
         // Sizing and Spacing
-        'h-auto min-h-[1.2em] resize-none overflow-auto px-3 py-2',
+        // 'h-auto min-h-[1.2em] resize-none overflow-auto px-3 py-2',
+        'h-auto resize-none overflow-visible',
 
         // Borders and Appearance
         'rounded-md bg-transparent shadow-xs',

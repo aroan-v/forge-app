@@ -1,11 +1,15 @@
+'use client'
 import DaisyThemeWrapper from '@/components/DaisyThemeWrapper'
 import MacroSetupForm from '@/components/MacroSetupForm'
+import { useStatsStore } from '../store/useStatsStore'
+import Spinner from '@/components/Spinner'
 
 export default function SetupPage() {
+  const isLoading = useStatsStore((s) => s.isLoading)
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       {/* Name Input */} <Hero />
-      <MacroSetupForm />
+      {!isLoading && <MacroSetupForm />}
       {/* <UserSetupForm /> */}
     </DaisyThemeWrapper>
   )
@@ -25,6 +29,10 @@ function Hero() {
       </div>
     </div>
   )
+}
+
+function LoadingDots() {
+  return <span className="ds-loading ds-loading-dots ds-loading-xl"></span>
 }
 
 function Card({ children }) {

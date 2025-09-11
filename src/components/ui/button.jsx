@@ -11,35 +11,45 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-muted text-muted-foreground shadow-xs hover:bg-muted/90',
+
         destructive: cn(
-          // Base appearance
           'bg-destructive text-destructive-foreground shadow-sm',
-
-          // Hover & active
           'hover:bg-destructive/80 active:bg-destructive/60',
-
-          // Focus ring
           'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-destructive/40 dark:focus-visible:ring-destructive/50',
-
-          // Disabled
           'disabled:opacity-50 disabled:pointer-events-none'
         ),
+
         outline:
           'border border-border bg-background text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+
         secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
+
         ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+
         link: 'text-primary underline-offset-4 hover:underline',
 
-        // New color-specific outline variants
-        defaultOutline: 'border border-muted/50 text-muted-foreground hover:bg-muted/70',
-        primaryOutline:
-          'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
-        secondaryOutline:
-          'border border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground',
-        accentOutline:
-          'border border-accent text-accent hover:bg-accent hover:text-accent-foreground',
-        destructiveOutline:
-          'border border-destructive/50 text-destructive/90 hover:bg-destructive/50 hover:text-destructive-foreground',
+        gradient: cn(
+          // Layout & spacing
+          'relative inline-flex items-center justify-center rounded-xl px-6 py-3',
+
+          // Typography
+          'font-semibold text-white',
+
+          // Background (direct gradient)
+          'bg-gradient-to-r from-accent to-neutral',
+
+          // Base effects
+          'shadow-md transition-all',
+
+          // Hover effects
+          'hover:scale-102 hover:shadow-lg',
+
+          // Active effects
+          'active:scale-95',
+
+          // Disabled state
+          'disabled:cursor-not-allowed disabled:opacity-50'
+        ),
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

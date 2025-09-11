@@ -84,6 +84,7 @@ function TableRow({ className, ...props }) {
 }
 
 function MotionTableRow({ motionId, className, ...props }) {
+  console.log('motion table row rendered')
   return (
     <motion.tr
       key={motionId}

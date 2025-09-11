@@ -5,10 +5,15 @@ import MealTable from '@/components/MealTable'
 import { Button } from '@/components/ui/button'
 import React from 'react'
 import { useFoodStore } from './store/useFoodStore'
+import { NutritionNotice } from '@/components/NutritionNotice'
+import CircularProgress from '@/components/CircularProgress'
+import { BicepsFlexed, Hamburger } from 'lucide-react'
+import { useStatsStore } from './store/useStatsStore'
 
 export default function Home() {
   const loggedFood = useFoodStore((s) => s.loggedFood)
   const addFoodGroup = useFoodStore((s) => s.addFoodGroup)
+  const userComputedStats = useStatsStore((s) => s.userComputedStats)
 
   console.log('loggedFood', loggedFood)
 
@@ -16,16 +21,19 @@ export default function Home() {
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
 
+      <TargetsSection />
+
+      <NutritionNotice />
       {loggedFood.map(({ name, id, meals }) => (
         <MealTable key={id} mealName={name} meals={meals} groupId={id} />
       ))}
 
-      <CalculateNutrition />
-
-      {/* ✅ New Group Button */}
       <Button variant="default" onClick={addFoodGroup}>
         + Add New Group
       </Button>
+      <CalculateNutrition />
+
+      {/* ✅ New Group Button */}
     </DaisyThemeWrapper>
   )
 }
@@ -108,6 +116,67 @@ function Hero() {
           </p>
         </div>
       </div>
+    </div>
+  )
+}
+
+function TargetsSection({ currentCalories, currentProtein }) {
+  const userComputedStats = useStatsStore((s) => s.userComputedStats)
+  const loggedFood = useFoodStore((s) => s.loggedFood)
+
+  console.log('userComputedStats', userComputedStats)
+
+  const {
+    totalCalories,
+    totalProtein,
+    totalCaloriesPercent,
+    totalProteinPercent,
+    remainingCalories,
+    remainingProtein,
+  } = React.useMemo(() => {
+    let totals = { totalCalories: 0, totalProtein: 0 }
+
+    loggedFood.forEach((mealGroup) => {
+      mealGroup.meals.forEach((meal) => {
+        totals.totalCalories += meal.calories || 0
+        totals.totalProtein += meal.protein || 0
+      })
+    })
+
+    const targetCalories = userComputedStats?.calorieGoal || 1
+    const targetProtein = userComputedStats?.proteinTarget || 1
+
+    return {
+      totalCalories: totals.totalCalories,
+      totalProtein: totals.totalProtein,
+      totalCaloriesPercent: Math.min((totals.totalCalories / targetCalories) * 100, 100),
+      totalProteinPercent: Math.min((totals.totalProtein / targetProtein) * 100, 100),
+      remainingCalories: Math.max(targetCalories - totals.totalCalories, 0),
+      remainingProtein: Math.max(targetProtein - totals.totalProtein, 0),
+    }
+  }, [loggedFood, userComputedStats])
+
+  return (
+    <div className="flex w-md justify-center gap-4 p-4">
+      <CircularProgress
+        color={'primary'}
+        value={totalCalories}
+        icon={Hamburger}
+        secondValue={remainingCalories}
+        label={'Calories consumed:'}
+        unit={'kcal'}
+        percent={totalCaloriesPercent}
+      />
+
+      <CircularProgress
+        color={'secondary'}
+        value={totalProtein}
+        icon={BicepsFlexed}
+        secondValue={remainingProtein}
+        label={'Protein consumed:'}
+        unit={'grams'}
+        percent={totalProteinPercent}
+      />
     </div>
   )
 }

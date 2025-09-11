@@ -7,43 +7,36 @@ export const useFoodStore = create(
   immer((set, get) => ({
     loggedFood: [
       {
-        name: 'breakfast',
-        id: 'breakfast232',
+        name: 'Breakfast',
+        id: 'breakfast_silog232',
         meals: [
           {
-            food: 'Rice',
-            value: 150, // grams
+            food: 'Garlic Fried Rice (Sinangag)',
+            value: 200, // grams
             unit: 'g',
-            id: 'ricedwdee',
-            displayValue: '150 g', // combined string
+            id: 'sinangag2023',
+            displayValue: '200 g',
           },
           {
-            food: 'Egg',
+            food: 'Fried Egg',
             value: 2, // 2 pcs
             unit: 'pcs',
-            id: 'eggdeed',
+            id: 'itlog2023',
             displayValue: '2 pcs',
           },
           {
-            food: 'Chicken Breast',
-            value: 120, // grams
-            unit: 'g',
-            id: '343434',
-            displayValue: '120 g',
-          },
-          {
-            food: 'Banana',
-            value: 1, // 1 pc
+            food: 'Longganisa (Sweet Pork Sausage)',
+            value: 3, // 3 pcs
             unit: 'pcs',
-            id: '3434wewc',
-            displayValue: '1 pcs',
+            id: 'longganisa2023',
+            displayValue: '3 pcs',
           },
           {
-            food: 'Peanut Butter',
-            value: 2, // 2 tbsp (custom quantity unit)
-            unit: 'tbsp',
-            id: '3434sdsd34',
-            displayValue: '2 tbsp',
+            food: 'Tomato & Cucumber Side Salad',
+            value: 100, // grams
+            unit: 'g',
+            id: 'ensalada2023',
+            displayValue: '100 g',
           },
         ],
       },

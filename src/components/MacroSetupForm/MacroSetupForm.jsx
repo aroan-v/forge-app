@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,141 +10,217 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import DaisyThemeWrapper from '../DaisyThemeWrapper'
+import { Bot } from 'lucide-react'
+import { useStatsStore } from '@/app/store/useStatsStore'
+import { generateUserStats } from '@/lib/nutritionUtils'
+import UserStats from '../UserStats'
+import { useFoodStore } from '@/app/store/useFoodStore'
 
 export default function MacroSetupForm() {
-  // ✅ Local state for each input
+  // Local form states
   const [name, setName] = useState('')
-  const [age, setAge] = useState('')
-  const [height, setHeight] = useState('')
-  const [weight, setWeight] = useState('')
-  const [gender, setGender] = useState('')
-  const [activityLevel, setActivityLevel] = useState('')
-  const [proteinGoal, setProteinGoal] = useState('')
+  const [age, setAge] = useState('28')
+  const [height, setHeight] = useState('163')
+  const [weight, setWeight] = useState('70')
+  const [gender, setGender] = useState('male')
+  const [activityLevel, setActivityLevel] = useState('moderate')
+  const [goal, setGoal] = useState('bulking')
 
-  // useEffect(() => {
-  //   async function getNutritionAdvice(prompt) {
-  //     const response = await fetch('/api/hugging-face', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ prompt }),
-  //     })
+  // Zustand actions
+  const setUserData = useStatsStore((state) => state.setUserData)
+  const setTargets = useStatsStore((state) => state.setTargets)
+  const setShallowState = useStatsStore((state) => state.setShallowState)
+  const userComputedStats = useStatsStore((state) => state.userComputedStats)
 
-  //     const data = await response.json()
-  //     console.log('Advice:', data)
-  //     return data
-  //   }
+  console.log('userComputedStats', userComputedStats)
 
-  //   // Example usage:
-  //   getNutritionAdvice('Suggest me a 30g protein dinner.')
-  // }, [])
-
-  // ✅ Handle form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const data = {
+    const rawData = {
       name,
       age: Number(age),
       height: Number(height),
       weight: Number(weight),
       gender,
       activityLevel,
+      goal,
     }
 
-    console.log('Form submitted ✅', data)
-    // Do whatever you want here (API, state, etc.)
+    const payload = {
+      ...rawData,
+      height: {
+        value: rawData.height,
+        unit: 'cm',
+      },
+      weight: {
+        value: rawData.weight,
+        unit: 'kg',
+      },
+    }
+
+    console.log('payload', rawData)
+    const stats = generateUserStats(rawData)
+    console.log('stats', stats)
+
+    console.log(stats)
+
+    setShallowState({
+      userComputedStats: stats,
+    })
+
+    localStorage.setItem('userStats', JSON.stringify(stats))
+
+    console.log('currentState', useStatsStore.getState())
+
+    return
+
+    try {
+      // 1. Save user profile in store
+      setUserData(payload)
+
+      // 2. Send profile to AI endpoint
+      const res = await fetch('/api/calc-goals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      const data = await res.json()
+      const rawContent = data.choices?.[0]?.message?.content
+
+      let parsedContent
+      try {
+        parsedContent = JSON.parse(rawContent)
+      } catch (e) {
+        console.error('❌ Failed to parse AI response:', rawContent)
+        parsedContent = null
+      }
+
+      console.log('parsedContent:', parsedContent)
+
+      // 3. Save AI targets in store
+      if (parsedContent) {
+        setTargets(parsedContent) // { targetCalories, targetProtein }
+        console.log('✅ AI Targets set', parsedContent)
+      }
+    } catch (err) {
+      console.error('❌ Error fetching AI targets:', err)
+    } finally {
+      // setIsLoading(false)
+    }
   }
 
   return (
-    <DaisyThemeWrapper>
-      <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
-        <fieldset className="ds-fieldset bg-base-200 border-base-300 rounded-box w-xs space-y-2 border p-4">
-          <label htmlFor="name" className="ds-label text-sm">
-            Name
-          </label>
-          <Input
-            id="name"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            minLength={2}
-          />
+    <DaisyThemeWrapper className="pb-20">
+      {userComputedStats && <UserStats stats={userComputedStats} />}
+      {!userComputedStats && (
+        <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
+          <fieldset className="ds-fieldset bg-base-200 border-base-300 rounded-box w-xs space-y-2 border p-4">
+            <label htmlFor="name" className="ds-label text-sm">
+              Name (Optional)
+            </label>
+            <Input
+              id="name"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              minLength={2}
+            />
 
-          <label className="ds-label">Age</label>
-          <Input
-            className="ds-input"
-            type="number"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            required
-            min={12}
-            max={100}
-          />
+            <label className="ds-label">Age</label>
+            <Input
+              className="ds-input"
+              type="number"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              required
+              min={12}
+              max={100}
+            />
 
-          <label htmlFor="heightInput" className="ds-label">
-            Height (cm)
-          </label>
-          <Input
-            id="heightInput"
-            type="number"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            required
-            min={100}
-            max={250}
-          />
+            <label htmlFor="heightInput" className="ds-label">
+              Height (cm)
+            </label>
+            <Input
+              id="heightInput"
+              type="number"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              required
+              min={100}
+              max={250}
+            />
 
-          <label htmlFor="weightInput" className="ds-label">
-            Weight (kg)
-          </label>
-          <Input
-            id="weightInput"
-            type="number"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            required
-            min={30}
-            max={300}
-          />
+            <label htmlFor="weightInput" className="ds-label">
+              Weight (kg)
+            </label>
+            <Input
+              id="weightInput"
+              type="number"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              required
+              min={30}
+              max={300}
+            />
 
-          <label htmlFor="genderInput" className="ds-label">
-            Gender
-          </label>
-          <Select className="w-full" onValueChange={setGender}>
-            <SelectTrigger id="genderInput">
-              <SelectValue placeholder="Select gender" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="non-binary">Non-binary</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-              <SelectItem value="prefer-not">Prefer not to say</SelectItem>
-            </SelectContent>
-          </Select>
+            <label htmlFor="genderInput" className="ds-label">
+              Gender
+            </label>
+            <Select className="w-full" onValueChange={setGender}>
+              <SelectTrigger id="genderInput">
+                <SelectValue placeholder="Select gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="male">Male</SelectItem>
+                <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="non-binary">Non-binary</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="prefer-not">Prefer not to say</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <label htmlFor="activityInput" className="ds-label">
-            Activity Level
-          </label>
-          <Select onValueChange={setActivityLevel}>
-            <SelectTrigger id="activityInput">
-              <SelectValue placeholder="Select activity level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sedentary">Sedentary</SelectItem>
-              <SelectItem value="light">Lightly Active</SelectItem>
-              <SelectItem value="moderate">Moderately Active</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="very-active">Very Active</SelectItem>
-            </SelectContent>
-          </Select>
+            <label htmlFor="activityInput" className="ds-label">
+              Activity Level
+            </label>
+            <Select onValueChange={setActivityLevel}>
+              <SelectTrigger id="activityInput">
+                <SelectValue placeholder="Select activity level" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sedentary">Sedentary — little or no exercise</SelectItem>
+                <SelectItem value="light">Lightly Active — 1–3 workouts/week</SelectItem>
+                <SelectItem value="moderate">Moderately Active — 3–5 workouts/week</SelectItem>
+                <SelectItem value="active">Active — 6–7 workouts/week</SelectItem>
+                <SelectItem value="very-active">
+                  Very Active — intense exercise or physical job
+                </SelectItem>
+              </SelectContent>
+            </Select>
 
-          <Button type="submit" className="ds-btn mt-4 w-full">
-            Save & Continue
-          </Button>
-        </fieldset>
-      </form>
+            <label htmlFor="goalInput" className="ds-label">
+              Goal
+            </label>
+            <Select onValueChange={setGoal}>
+              <SelectTrigger id="goalInput">
+                <SelectValue placeholder="Select your goal" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cutting">Lose Weight / Cutting</SelectItem>
+                <SelectItem value="bulking">Gain Muscle / Bulking</SelectItem>
+                <SelectItem value="recomp">Maintain / Recomp</SelectItem>
+                <SelectItem value="general_fitness">General Fitness</SelectItem>
+                <SelectItem value="endurance">Endurance / Cardio Focus</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button type="submit" variant="gradient" className="mt-4">
+              Calculate with AI <Bot />
+            </Button>
+          </fieldset>
+        </form>
+      )}
     </DaisyThemeWrapper>
   )
 }

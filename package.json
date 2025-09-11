@@ -28,6 +28,8 @@
     "nanoid": "^5.1.5",
     "next": "15.5.2",
     "react": "19.1.0",
+    "react-circular-progressbar": "^2.2.0",
+    "react-countup": "^6.5.3",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "tailwind-merge": "^3.3.1",
