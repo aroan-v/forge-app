@@ -57,6 +57,7 @@ function MealTable({ groupId }) {
 
   const [localMealName, setLocalMealName] = useState(mealName)
   const [isEditingHeader, setIsEditingHeader] = useState(false)
+  const deleteFoodGroup = useFoodStoreVersionTwo((s) => s.deleteFoodGroup)
 
   const handleToggle = () => {
     if (isEditingHeader) {
@@ -67,15 +68,14 @@ function MealTable({ groupId }) {
     setIsEditingHeader(!isEditingHeader)
   }
 
-  const deleteFoodGroup = useFoodStore((s) => s.deleteFoodGroup)
-
+  // This is for better UX, automatically focuses on the header input when changing the group name
   const inputRef = useRef(null)
   useEffect(() => {
     if (isEditingHeader && inputRef.current) {
       setTimeout(() => {
         inputRef.current?.focus()
-        inputRef.current?.select() // optional: select text for easier editing
-      }, 500) // 50-100ms usually works
+        inputRef.current?.select()
+      }, 500)
     }
   }, [isEditingHeader])
 
@@ -161,51 +161,30 @@ function MealTable({ groupId }) {
           )}
         </AnimatePresence>
       </motion.div>
-      <MotionTable className="w-full table-fixed">
-        <MotionTableHeader>
-          <MotionTableRow>
-            {deleteMode && (
-              <TableHead className="text-destructive/80 w-[30px]">
-                <Trash2 size={16} />
-              </TableHead>
-            )}
-            <TableHead className="w-[150px]">Food</TableHead>
-            <TableHead className="w-[100px]">Amount</TableHead>
-            <TableHead className="text-primary w-[75px] text-center">Calories</TableHead>
-            <TableHead className="text-accent w-[75px] text-center">Protein</TableHead>
-          </MotionTableRow>
-        </MotionTableHeader>
 
-        <TableBody>
-          <MealTableRows
-            group={meals}
-            mealIds={mealIds}
-            selectItems={[...UNITS.weight, ...UNITS.quantity]}
-            groupId={groupId}
-            deleteMode={deleteMode}
-            setDeleteMode={setDeleteMode}
-            idsToDelete={idsToDelete}
-            handleToggleId={handleToggleId}
-          />
-
-          {/* ✅ Running total row */}
-          <MotionTableRow className="bg-muted/20 font-semibold">
-            <TableCell></TableCell>
-            {deleteMode && <TableCell></TableCell>}
-            <TableCell className="text-center"></TableCell>
-            <TableCell className="text-center">
-              <span className="text-primary">{totalCalories}kcal</span>
-            </TableCell>
-            <TableCell className="text-center">
-              <span className="text-accent">{totalProtein}g</span>
-            </TableCell>
-          </MotionTableRow>
-        </TableBody>
-      </MotionTable>
+      <TableStructure
+        deleteMode={deleteMode}
+        totalCalories={totalCalories}
+        totalProtein={totalProtein}
+      >
+        <MealTableRows
+          group={meals}
+          mealIds={mealIds}
+          selectItems={[...UNITS.weight, ...UNITS.quantity]}
+          groupId={groupId}
+          deleteMode={deleteMode}
+          setDeleteMode={setDeleteMode}
+          idsToDelete={idsToDelete}
+          handleToggleId={handleToggleId}
+        />
+      </TableStructure>
 
       <div className="mt-4 flex justify-center gap-2">
         {deleteMode ? (
           <>
+            <Button size="sm" variant="defaultOutline" onClick={() => setDeleteMode(false)}>
+              Cancel Delete Rows
+            </Button>
             <Button
               disabled={idsToDelete.length === 0}
               variant="destructiveOutline"
@@ -217,9 +196,6 @@ function MealTable({ groupId }) {
               }}
             >
               <Trash2 /> Delete
-            </Button>
-            <Button size="sm" variant="defaultOutline" onClick={() => setDeleteMode(false)}>
-              Cancel Delete Rows
             </Button>
           </>
         ) : (
@@ -244,6 +220,43 @@ function MealTable({ groupId }) {
         )}
       </div>
     </motion.div>
+  )
+}
+
+function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
+  return (
+    <MotionTable className="w-full table-fixed">
+      <MotionTableHeader>
+        <MotionTableRow>
+          {deleteMode && (
+            <TableHead className="text-destructive/80 w-[30px]">
+              <Trash2 size={16} />
+            </TableHead>
+          )}
+          <TableHead className="w-[150px]">Food</TableHead>
+          <TableHead className="w-[100px]">Amount</TableHead>
+          <TableHead className="text-primary w-[75px] text-center">Calories</TableHead>
+          <TableHead className="text-accent w-[75px] text-center">Protein</TableHead>
+        </MotionTableRow>
+      </MotionTableHeader>
+
+      <TableBody>
+        {children}
+
+        {/* ✅ Running total row */}
+        <MotionTableRow className="bg-muted/20 font-semibold">
+          <TableCell></TableCell>
+          {deleteMode && <TableCell></TableCell>}
+          <TableCell className="text-center"></TableCell>
+          <TableCell className="text-center">
+            <span className="text-primary">{totalCalories}kcal</span>
+          </TableCell>
+          <TableCell className="text-center">
+            <span className="text-accent">{totalProtein}g</span>
+          </TableCell>
+        </MotionTableRow>
+      </TableBody>
+    </MotionTable>
   )
 }
 

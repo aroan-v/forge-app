@@ -342,28 +342,39 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
   foodBank: {},
 
   addFoodGroup: () =>
-    set((state) => ({
-      loggedFood: [
-        ...state.loggedFood,
-        {
-          name: null,
-          id: nanoid(),
-          meals: [
-            {
-              food: null,
-              value: 0,
-              unit: '',
-              id: nanoid(),
-            },
-          ],
-        },
-      ],
-    })),
+    set(
+      produce((state) => {
+        const newId = nanoid()
 
-  deleteFoodGroup: (groupId) =>
-    set((state) => ({
-      loggedFood: state.loggedFood.filter(({ id }) => id !== groupId),
-    })),
+        state.foodGroups.push(newId)
+        state.groupsById[newId] = {
+          name: '',
+          mealIds: [],
+        }
+      })
+    ),
+
+  deleteFoodGroup: (targetGroupId) =>
+    set(
+      produce((state) => {
+        state.foodGroups = state.foodGroups.filter((id) => id !== targetGroupId)
+
+        const index = state.foodGroups.findIndex((id) => id === targetGroupId)
+        if (index !== -1) {
+          state.foodGroups.splice(index, 1)
+        }
+
+        const targetGroup = state.groupsById[targetGroupId]
+        if (targetGroup) {
+          const targetMealIds = targetGroup.mealIds
+          delete state.groupsById[targetGroupId]
+
+          targetMealIds.forEach((id) => {
+            delete state.mealsById[id]
+          })
+        }
+      })
+    ),
 
   addMealRow: (targetGroupId) => {
     set((state) => {
