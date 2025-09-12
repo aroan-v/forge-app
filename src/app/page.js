@@ -3,29 +3,33 @@ import CalculateNutrition from '@/components/CalculateNutrition'
 import DaisyThemeWrapper from '@/components/DaisyThemeWrapper'
 import MealTable from '@/components/MealTable'
 import { Button } from '@/components/ui/button'
-import React from 'react'
-import { useFoodStore } from './store/useFoodStore'
+import React, { use } from 'react'
+import { useFoodStore, useFoodStoreVersionTwo } from './store/useFoodStore'
 import { NutritionNotice } from '@/components/NutritionNotice'
 import CircularProgress from '@/components/CircularProgress'
 import { BicepsFlexed, Hamburger } from 'lucide-react'
 import { useStatsStore } from './store/useStatsStore'
+import { devLog } from '@/lib/logger'
 
 export default function Home() {
-  const loggedFood = useFoodStore((s) => s.loggedFood)
-  const addFoodGroup = useFoodStore((s) => s.addFoodGroup)
+  const loggedFood = useFoodStoreVersionTwo((s) => s.loggedFood)
+  // const addFoodGroup = useFoodStore((s) => s.addFoodGroup)
   const userComputedStats = useStatsStore((s) => s.userComputedStats)
+  const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
+  const foodGroups = useFoodStoreVersionTwo((s) => s.foodGroups)
 
   console.log('loggedFood', loggedFood)
+  devLog('foodGroups', foodGroups)
 
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
 
-      <TargetsSection />
+      {/* <TargetsSection /> */}
 
       <NutritionNotice />
-      {loggedFood.map(({ name, id, meals }) => (
-        <MealTable key={id} mealName={name} meals={meals} groupId={id} />
+      {foodGroups.map((id) => (
+        <MealTable key={id} groupId={id} />
       ))}
 
       <Button variant="default" onClick={addFoodGroup}>

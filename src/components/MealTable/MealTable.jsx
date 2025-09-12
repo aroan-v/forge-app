@@ -28,19 +28,31 @@ import {
 } from '@/components/ui/select'
 import SettingsAction from '../SettingsAction'
 import { UNITS, UNIT_TYPES, sampleData, templateData } from '@/app/schemas/foodSchema'
-import { useFoodStore } from '@/app/store/useFoodStore'
+import { useFoodStore, useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import { Textarea } from '../ui/textarea'
 import { cn } from '@/lib/utils'
 import MealTableRows from './MealTableRows'
+import { devLog } from '@/lib/logger'
 
-function MealTable({ mealName = 'Breakfast', meals, groupId }) {
-  console.log('group with an id rendered', groupId)
+function MealTable({ groupId }) {
+  devLog('group with an id rendered', groupId)
   // Declare the initial meals to the local state
+
+  // Version Two
+  const groupInfo = useFoodStoreVersionTwo((s) => s.groupsById[groupId])
+  const deleteMealRow = useFoodStoreVersionTwo((s) => s.deleteMealRow)
+
+  devLog('groupInfo', groupInfo)
+
+  const meals = []
+  const mealName = groupInfo?.name
+  const mealIds = groupInfo?.mealIds
+
+  devLog('mealIds', mealIds)
+
   const [rows, setRows] = useState(meals)
   const [deleteMode, setDeleteMode] = useState(false)
-  const [deleteIds, setDeleteIds] = useState([])
   const addMealRow = useFoodStore((s) => s.addMealRow)
-  const deleteMealRow = useFoodStore((s) => s.deleteMealRow)
   const updateGroupName = useFoodStore((s) => s.updateGroupName)
 
   const [localMealName, setLocalMealName] = useState(mealName)
@@ -67,9 +79,19 @@ function MealTable({ mealName = 'Breakfast', meals, groupId }) {
     }
   }, [isEditingHeader])
 
-  function toggleDeleteId(rowId, checked) {
-    setDeleteIds((prev) => (checked ? [...prev, rowId] : prev.filter((id) => id !== rowId)))
-  }
+  // Handle Toggling of rows to delete
+  const [idsToDelete, setIdsToDelete] = useState([])
+  const handleToggleId = React.useCallback((rowId) => {
+    setIdsToDelete((prev) => {
+      if (prev.includes(rowId)) {
+        return prev.filter((id) => id !== rowId)
+      } else {
+        return [...prev, rowId]
+      }
+    })
+  }, [])
+
+  devLog('idsToDelete', idsToDelete)
 
   // Handle input changes for local states
   const handleChange = ({ foodId, field, value }) => {
@@ -91,9 +113,6 @@ function MealTable({ mealName = 'Breakfast', meals, groupId }) {
 
   const totalProtein =
     Math.round((meals?.reduce((sum, row) => sum + Number(row.protein ?? 0), 0) ?? 0) * 10) / 10
-
-  const tableCellClassNames =
-    'border-input bg-background text-foreground focus:ring-primary/50 w-full rounded-md border px-2 py-1 text-center text-sm focus:ring-2 focus:outline-none'
 
   return (
     <motion.div
@@ -160,12 +179,13 @@ function MealTable({ mealName = 'Breakfast', meals, groupId }) {
         <TableBody>
           <MealTableRows
             group={meals}
+            mealIds={mealIds}
             selectItems={[...UNITS.weight, ...UNITS.quantity]}
             groupId={groupId}
             deleteMode={deleteMode}
             setDeleteMode={setDeleteMode}
-            deleteIds={deleteIds}
-            toggleDeleteId={toggleDeleteId}
+            idsToDelete={idsToDelete}
+            handleToggleId={handleToggleId}
           />
 
           {/* ✅ Running total row */}
@@ -187,13 +207,13 @@ function MealTable({ mealName = 'Breakfast', meals, groupId }) {
         {deleteMode ? (
           <>
             <Button
-              disabled={deleteIds.length === 0}
+              disabled={idsToDelete.length === 0}
               variant="destructiveOutline"
               size="sm"
               onClick={() => {
                 setTimeout(() => setDeleteMode(false), 1000)
-                setDeleteIds([])
-                deleteMealRow({ groupId, foodIds: deleteIds })
+                setIdsToDelete([])
+                deleteMealRow({ targetMealIds: idsToDelete, targetGroupId: groupId })
               }}
             >
               <Trash2 /> Delete
@@ -205,7 +225,7 @@ function MealTable({ mealName = 'Breakfast', meals, groupId }) {
         ) : (
           <>
             <Button
-              disabled={meals.length >= 10}
+              disabled={mealIds.length >= 10}
               onClick={() => addMealRow(groupId)}
               size="sm"
               variant="defaultOutline"
@@ -213,7 +233,7 @@ function MealTable({ mealName = 'Breakfast', meals, groupId }) {
               Add Row
             </Button>
             <Button
-              disabled={meals.length <= 1}
+              disabled={mealIds.length <= 1}
               onClick={() => setDeleteMode(true)}
               size="sm"
               variant="destructiveOutline"

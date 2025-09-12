@@ -50,6 +50,16 @@ const buttonVariants = cva(
           // Disabled state
           'disabled:cursor-not-allowed disabled:opacity-50'
         ),
+
+        defaultOutline: 'border border-muted/50 text-muted-foreground hover:bg-muted/70',
+        primaryOutline:
+          'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
+        secondaryOutline:
+          'border border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground',
+        accentOutline:
+          'border border-accent text-accent hover:bg-accent hover:text-accent-foreground',
+        destructiveOutline:
+          'border border-destructive/50 text-destructive/90 hover:bg-destructive/50 hover:text-destructive-foreground',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

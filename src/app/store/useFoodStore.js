@@ -2,6 +2,8 @@ import { PcCase } from 'lucide-react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { nanoid } from 'nanoid'
+import { devLog } from '@/lib/logger'
+import { produce } from 'immer'
 
 export const useFoodStore = create(
   immer((set, get) => ({
@@ -28,7 +30,6 @@ export const useFoodStore = create(
             food: 'Longganisa (Sweet Pork Sausage)',
             value: 3, // 3 pcs
             unit: 'pcs',
-            id: 'longganisa2023',
             displayValue: '3 pcs',
           },
           {
@@ -60,9 +61,9 @@ export const useFoodStore = create(
       }),
 
     deleteFoodGroup: (groupId) =>
-      set((state) => {
-        state.loggedFood = state.loggedFood.filter(({ id }) => id !== groupId)
-      }),
+      set((state) => ({
+        loggedFood: state.loggedFood.filter(({ id }) => id !== groupId),
+      })),
 
     addMealRow: (targetId) => {
       set((state) => {
@@ -264,3 +265,308 @@ export const useFoodStore = create(
       }),
   }))
 )
+
+export const useFoodStoreVersionTwo = create((set, get) => ({
+  loggedFood: [
+    {
+      name: 'Breakfast version two',
+      id: 'breakfast_silog232',
+      meals: [
+        {
+          food: 'Garlic Fried Rice (Sinangag)',
+          value: 200, // grams
+          unit: 'g',
+          id: 'sinangag2023',
+          displayValue: '200 g',
+        },
+        {
+          food: 'Fried Egg',
+          value: 2, // 2 pcs
+          unit: 'pcs',
+          id: 'itlog2023',
+          displayValue: '2 pcs',
+        },
+        {
+          food: 'Longganisa (Sweet Pork Sausage)',
+          value: 3, // 3 pcs
+          unit: 'pcs',
+          displayValue: '3 pcs',
+        },
+        {
+          food: 'Tomato & Cucumber Side Salad',
+          value: 100, // grams
+          unit: 'g',
+          id: 'ensalada2023',
+          displayValue: '100 g',
+        },
+      ],
+    },
+  ],
+
+  foodGroups: ['breakfast_silog232'],
+
+  groupsById: {
+    breakfast_silog232: {
+      name: 'Breakfast Version Two',
+      mealIds: ['sinangag2023', 'itlog2023', 'longganisa_123', 'ensalada2023'],
+    },
+  },
+
+  mealsById: {
+    sinangag2023: {
+      food: 'Garlic Fried Rice (Sinangag)',
+      value: 200,
+      unit: 'g',
+      displayValue: '200 g',
+    },
+    itlog2023: {
+      food: 'Fried Egg',
+      value: 2,
+      unit: 'pcs',
+      displayValue: '2 pcs',
+    },
+    longganisa_123: {
+      food: 'Longganisa (Sweet Pork Sausage)',
+      value: 3,
+      unit: 'pcs',
+      displayValue: '3 pcs',
+    },
+    ensalada2023: {
+      food: 'Tomato & Cucumber Side Salad',
+      value: 100,
+      unit: 'g',
+      displayValue: '100 g',
+    },
+  },
+
+  foodBank: {},
+
+  addFoodGroup: () =>
+    set((state) => ({
+      loggedFood: [
+        ...state.loggedFood,
+        {
+          name: null,
+          id: nanoid(),
+          meals: [
+            {
+              food: null,
+              value: 0,
+              unit: '',
+              id: nanoid(),
+            },
+          ],
+        },
+      ],
+    })),
+
+  deleteFoodGroup: (groupId) =>
+    set((state) => ({
+      loggedFood: state.loggedFood.filter(({ id }) => id !== groupId),
+    })),
+
+  addMealRow: (targetGroupId) => {
+    set((state) => {
+      const targetGroup = state.loggedFood.find(({ id }) => id === targetGroupId)
+      if (!targetGroup) {
+        devLog('targetGroup not found', targetGroup)
+        return
+      }
+
+      targetGroup.meals.push({
+        food: null,
+        value: 0,
+        unit: '',
+        id: nanoid(),
+      })
+    })
+  },
+
+  deleteMealRow: ({ targetMealIds, targetGroupId }) => {
+    set(
+      produce((state) => {
+        const targetGroup = state.groupsById[targetGroupId]
+
+        if (targetGroup) {
+          targetGroup.mealIds = targetGroup.mealIds.filter((id) => !targetMealIds.includes(id))
+
+          targetMealIds.forEach((id) => {
+            delete state.mealsById[id]
+          })
+        }
+      })
+    )
+  },
+
+  getUnregisteredFoods: () => {
+    const currentState = get()
+    const foodWithoutNutrition = {}
+
+    currentState.loggedFood.forEach(({ meals, id: groupId }) => {
+      meals.forEach((foodObj) => {
+        const { food, id: foodId, displayValue, protein, calories } = foodObj
+
+        if (food && foodId && displayValue && (protein == null || calories == null)) {
+          if (!foodWithoutNutrition[groupId]) {
+            foodWithoutNutrition[groupId] = {}
+          }
+
+          foodWithoutNutrition[groupId][foodId] = {
+            food,
+            displayValue,
+          }
+        }
+      })
+    })
+
+    return foodWithoutNutrition
+  },
+
+  updateGroupName: ({ groupId, groupName }) =>
+    set((state) => {
+      const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
+
+      if (targetGroup) {
+        targetGroup.name = groupName
+      }
+    }),
+
+  updateLoggedFoodName: ({ groupId, foodId, foodName, displayValue }) =>
+    set((state) => {
+      const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
+
+      if (targetGroup.meals) {
+        const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
+
+        console.log('targetMeal', targetMeal)
+
+        if (targetMeal) {
+          if (foodName !== undefined) {
+            targetMeal.food = foodName ?? ''
+          }
+        } else {
+          console.warn('target meal not found')
+        }
+      } else {
+        console.warn('target group not found')
+      }
+    }),
+
+  updateLoggedFoodAmount: ({ groupId, foodId, displayValue }) =>
+    set((state) => {
+      const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
+
+      if (targetGroup.meals) {
+        const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
+
+        if (targetMeal) {
+          if (displayValue !== undefined) {
+            targetMeal.displayValue = displayValue ?? ''
+          }
+        } else {
+          console.warn('target meal not found')
+        }
+      } else {
+        console.warn('target group not found')
+      }
+    }),
+
+  updateLoggedFoodWithNutrition: (nutritionData) =>
+    set((state) => {
+      console.log('received nutrition data', nutritionData)
+
+      state.loggedFood.forEach((groupMeal) => {
+        const enrichedGroup = nutritionData[groupMeal.id]
+        if (!enrichedGroup) return
+
+        groupMeal.meals.forEach((food) => {
+          const enriched = enrichedGroup[food.id]
+          if (!enriched) return
+
+          // ✅ Safe to mutate via Immer
+          food.calories = Number(enriched.calories)
+          food.protein = Number(enriched.protein)
+        })
+      })
+    }),
+
+  setFoodBank: (foodObject) =>
+    set((prev) => {
+      // guard clause: only allow non-null objects
+      if (!foodObject || typeof foodObject !== 'object' || Array.isArray(foodObject)) {
+        return prev
+      }
+
+      console.log('foodObject recieved', foodObject)
+      const newFoodBank = { ...prev.foodBank }
+
+      // Expected format of foodObject
+      /*
+            const foodBank = {
+            egg: {
+                servings: {
+                piece: {
+                    quantity: 1,        // base unit = 1 piece
+                    calories: 75,       // macros for 1 piece
+                    protein: 6
+                },
+                gram: {
+                    quantity: 1,        // base unit = 1 gram
+                    calories: 1.5,      // macros per gram
+                    protein: 0.08
+                }
+                }
+            },
+            rice: {
+                servings: {
+                gram: {
+                    quantity: 1,        // base unit = 1 gram
+                    calories: 1.3,      // macros per gram
+                    protein: 0.025
+                },
+                cup: {
+                    quantity: 1,        // base unit = 1 cup
+                    calories: 200,
+                    protein: 4
+                }
+                }
+            }
+            }
+        */
+
+      // sample foodObject
+      /*
+        const sampleFoodObject = {
+            egg: {
+                serving: piece,
+                quantity: 1,
+                calories: 75,
+                protein: 7
+            }
+        }
+        */
+
+      for (const food in foodObject) {
+        console.log('logging food:', food)
+        //   check if the food already exists
+
+        const foodData = foodObject[food]
+
+        if (!newFoodBank[food]) {
+          newFoodBank[food] = {
+            servings: {},
+          }
+        }
+
+        newFoodBank[food].servings[foodData.serving] = {
+          quantity: foodData.quantity,
+          calories: foodData.calories,
+          protein: foodData.protein,
+        }
+      }
+
+      return {
+        foodBank: newFoodBank,
+      }
+    }),
+}))
