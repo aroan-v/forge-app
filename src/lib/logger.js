@@ -1,15 +1,14 @@
 export const devLog = (label, ...args) => {
   if (process.env.NODE_ENV !== 'production') {
-    const stack = new Error().stack
-    let location = ''
+    // Start a collapsible group for a clean console.
+    console.groupCollapsed(`[${label}]`, ...args)
 
-    if (stack) {
-      const callerLine = stack.split('\n')[2]?.trim()
-      location = ` @ ${callerLine}`
-    }
+    // Print the full stack trace. The first line of the stack trace
+    // will show exactly where devLog was called from.
+    console.trace()
 
-    // Print label + value + location in one entry
-    console.log(`[${label}]`, ...args, location)
+    // End the log group.
+    console.groupEnd()
   }
 }
 

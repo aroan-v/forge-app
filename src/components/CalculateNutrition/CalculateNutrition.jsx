@@ -1,28 +1,36 @@
 'use client'
 import React from 'react'
 import { Button } from '../ui/button'
+
 import { sampleRawData } from '@/app/schemas/foodSchema'
-import { useFoodStore } from '@/app/store/useFoodStore'
+import { useFoodStore, useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import SimpleCard from '../SimpleCard'
 import { Bot } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { devLog } from '@/lib/logger'
+import { Card } from '../ui/card'
 
 function CalculateNutrition() {
   const [content, setContent] = React.useState('') // holds any messages to show in UI
   const [isLoading, setIsLoading] = React.useState(false) // tracks loading state
+  const [localUnregisteredFood, setLocalUnregisteredFood] = React.useState({})
+  const [buttonDisabled, setButtonDisabled] = React.useState(false)
 
-  const getUnregisteredFoods = useFoodStore((s) => s.getUnregisteredFoods)
-  const updateLoggedFoodWithNutrition = useFoodStore((s) => s.updateLoggedFoodWithNutrition)
+  const getUnregisteredFoods = useFoodStoreVersionTwo((s) => s.getUnregisteredFoods)
+  const badNutritionResponses = useFoodStoreVersionTwo((s) => s.badNutritionResponses)
 
-  const unregisteredFoods = getUnregisteredFoods() // collect unregistered foods
-  console.log('unregisteredFoods', unregisteredFoods)
+  const updateLoggedFoodWithNutrition = useFoodStoreVersionTwo(
+    (s) => s.updateLoggedFoodWithNutrition
+  )
 
-  const fetchNutrition = async () => {
+  devLog('localUnregisteredFood', localUnregisteredFood)
+  devLog('badNutritionResponses', badNutritionResponses)
+
+  const fetchNutrition = async (unregisteredFoods) => {
     setIsLoading(true)
-    setContent(`Getting data for ${Object.keys(unregisteredFoods).join(', ')}`)
 
     try {
-      const res = await fetch('/api/calc-macros', {
+      const res = await fetch('/api/calc-macros-groq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(unregisteredFoods),
@@ -30,59 +38,106 @@ function CalculateNutrition() {
 
       console.log('passed unregistered food to AI', unregisteredFoods)
 
-      const data = await res.json()
-      const rawContent = data.choices[0].message.content
+      devLog('resonseReceived', res)
 
-      let parsedContent
-      try {
-        parsedContent = JSON.parse(rawContent)
-      } catch (e) {
-        console.error('Failed to parse JSON from model:', rawContent)
-        parsedContent = null
+      // Manual check
+      if (!res.ok) {
+        throw new Error(`Server responded with a ${res.status} status.`)
       }
 
-      if (parsedContent) {
-        updateLoggedFoodWithNutrition(parsedContent)
-        console.log('updatedLoggedFood', parsedContent)
+      const data = await res.json()
+      // let parsedContent = {
+      //   // ✅ Good ones
+      //   sinangag2023: {
+      //     food: 'Garlic Fried Rice (Sinangag)',
+      //     displayValue: '200 g',
+      //     calories: 340,
+      //     protein: 6.4,
+      //   },
+      //   itlog2023: {
+      //     food: 'Fried Egg',
+      //     displayValue: '2 pcs',
+      //     calories: 184,
+      //     protein: 12.4,
+      //   },
+      //   longganisa_123: {
+      //     food: 'Longganisa (Sweet Pork Sausage)',
+      //     displayValue: '3 pcs',
+      //     calories: 285,
+      //     protein: 15.3,
+      //   },
+      //   ensalada2023: {
+      //     food: 'Tomato & Cucumber Side Salad',
+      //     displayValue: '100 g',
+      //     calories: 18,
+      //     protein: 0.9,
+      //   },
+
+      //   // ❌ Bad Case 1: Unknown ID
+      //   mysteryDish999: {
+      //     food: 'AI Glitched Dish',
+      //     displayValue: '1 serving',
+      //     calories: 420,
+      //     protein: 9,
+      //   },
+      //   // ❌ Bad Case 2: Known ID but invalid nutrition
+      //   itlog2023_clone: {
+      //     food: 'Weird Duplicate Egg',
+      //     displayValue: '2 pcs',
+      //     calories: null,
+      //     protein: null,
+      //   },
+
+      //   // ❌ Bad Case 3: Known ID but only one valid field (edge case)
+      //   sinangag2023_fake: {
+      //     food: 'Rice with Missing Protein',
+      //     displayValue: '150 g',
+      //     calories: 200,
+      //     protein: null,
+      //   },
+      // }
+
+      devLog('dataReceived', data)
+
+      if (data) {
+        updateLoggedFoodWithNutrition(data)
+        devLog('updatedLoggedFood', data)
         setContent('Nutrition data updated successfully ✅')
       } else {
         setContent('⚠️ Failed to parse nutrition data')
       }
     } catch (err) {
       console.error(err)
+      setButtonDisabled(true)
       setContent('❌ Error fetching nutrition data')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const fetchJustTheNutrition = () => {
-    setIsLoading(true)
-    console.log('Unregistered foods (raw)', unregisteredFoods)
+  const unregisteredFoods = { test: 'test' }
 
-    // Pretty-print JSON for easier debugging in UI
-    setContent(`Unregistered Foods:\n${JSON.stringify(unregisteredFoods, null, 2)}`)
+  const getLatestUnregisteredFoods = () => {
+    const currentUnregisteredFood = getUnregisteredFoods()
+    devLog('currentUnregisteredFood', currentUnregisteredFood)
 
-    setIsLoading(false)
+    const unregisteredFoodArray = Object.values(currentUnregisteredFood).map(({ food }) => food)
+
+    if (unregisteredFoodArray.length > 0) {
+      setLocalUnregisteredFood(unregisteredFoodArray)
+      setContent(`Getting data for ${unregisteredFoodArray.join(', ')}`)
+      fetchNutrition(currentUnregisteredFood)
+    }
   }
 
   return (
     <div className="space-y-4 text-center">
-      {Object.keys(unregisteredFoods).length === 0 && (
+      {/* {) === 0 && (
         <span className="text-muted-foreground block text-xs font-medium">
           Add valid entries before AI can calculate what you ate!
         </span>
-      )}
-      <Button
-        onClick={fetchNutrition}
-        disabled={isLoading || Object.keys(unregisteredFoods).length === 0}
-        variant="gradient"
-      >
-        <span className="relative z-10 flex gap-2 align-middle">
-          {isLoading ? 'Calculating…' : 'Calculate Nutrition with AI'}
-          {!isLoading && <Bot />}
-        </span>
-      </Button>
+        
+      )} */}
 
       {isLoading && <p className="text-muted-foreground text-sm">{content}</p>}
 
@@ -90,10 +145,22 @@ function CalculateNutrition() {
         <pre className="text-sm font-medium whitespace-pre-wrap">{content}</pre>
       )}
 
+      <Button
+        onClick={getLatestUnregisteredFoods}
+        disabled={isLoading || buttonDisabled}
+        variant="gradient"
+      >
+        <span className="relative z-10 flex gap-2 align-middle">
+          {isLoading ? 'Calculating…' : 'Calculate Nutrition with AI'}
+          {!isLoading && <Bot />}
+        </span>
+      </Button>
       <p className="text-muted-foreground text-xs">
         Powered by <code className="font-mono">moonshotai/Kimi-K2-Instruct-0905</code> on{' '}
         <code className="font-mono">groq</code>
       </p>
+
+      {badNutritionResponses.length > 0 && <BadResponsesSection data={badNutritionResponses} />}
     </div>
   )
 
@@ -118,3 +185,14 @@ function CalculateNutrition() {
 }
 
 export default CalculateNutrition
+
+function BadResponsesSection({ data = [] }) {
+  return (
+    <Card>
+      <h4 className="font-bold">Skipped Foods</h4>
+      <p className="mt-1 text-sm">
+        Oops! Couldn’t read data for: {data.map((entry) => entry.food).join(', ')}
+      </p>
+    </Card>
+  )
+}

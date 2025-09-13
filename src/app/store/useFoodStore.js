@@ -2,8 +2,8 @@ import { PcCase } from 'lucide-react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { nanoid } from 'nanoid'
-import { devLog } from '@/lib/logger'
-import { produce } from 'immer'
+import { devError, devLog } from '@/lib/logger'
+import { current, produce } from 'immer'
 
 export const useFoodStore = create(
   immer((set, get) => ({
@@ -305,6 +305,8 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
 
   foodGroups: ['breakfast_silog232'],
 
+  badNutritionResponses: [],
+
   groupsById: {
     breakfast_silog232: {
       name: 'Breakfast Version Two',
@@ -377,20 +379,22 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
     ),
 
   addMealRow: (targetGroupId) => {
-    set((state) => {
-      const targetGroup = state.loggedFood.find(({ id }) => id === targetGroupId)
-      if (!targetGroup) {
-        devLog('targetGroup not found', targetGroup)
-        return
-      }
+    set(
+      produce((state) => {
+        const newFood = {
+          id: nanoid(),
+          food: null,
+          value: 0,
+          unit: '',
+          displayValue: '',
+        }
 
-      targetGroup.meals.push({
-        food: null,
-        value: 0,
-        unit: '',
-        id: nanoid(),
+        if (state.groupsById[targetGroupId]) {
+          state.groupsById[targetGroupId].mealIds.push(newFood.id)
+          state.mealsById[newFood.id] = newFood
+        }
       })
-    })
+    )
   },
 
   deleteMealRow: ({ targetMealIds, targetGroupId }) => {
@@ -413,22 +417,18 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
     const currentState = get()
     const foodWithoutNutrition = {}
 
-    currentState.loggedFood.forEach(({ meals, id: groupId }) => {
-      meals.forEach((foodObj) => {
-        const { food, id: foodId, displayValue, protein, calories } = foodObj
+    for (const id in currentState.mealsById) {
+      if (currentState.mealsById.hasOwnProperty(id)) {
+        const { food, displayValue, protein, calories } = currentState.mealsById[id]
 
-        if (food && foodId && displayValue && (protein == null || calories == null)) {
-          if (!foodWithoutNutrition[groupId]) {
-            foodWithoutNutrition[groupId] = {}
-          }
-
-          foodWithoutNutrition[groupId][foodId] = {
+        if (food && displayValue && (protein == null || calories == null)) {
+          foodWithoutNutrition[id] = {
             food,
             displayValue,
           }
         }
-      })
-    })
+      }
+    }
 
     return foodWithoutNutrition
   },
@@ -442,64 +442,72 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
       }
     }),
 
-  updateLoggedFoodName: ({ groupId, foodId, foodName, displayValue }) =>
-    set((state) => {
-      const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
-
-      if (targetGroup.meals) {
-        const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
-
-        console.log('targetMeal', targetMeal)
-
-        if (targetMeal) {
-          if (foodName !== undefined) {
-            targetMeal.food = foodName ?? ''
-          }
+  updateLoggedFoodName: ({ foodId, foodName }) =>
+    set(
+      produce((state) => {
+        if (state.mealsById[foodId]) {
+          state.mealsById[foodId].food = foodName
         } else {
-          console.warn('target meal not found')
+          devError('foodId not found', foodId)
         }
-      } else {
-        console.warn('target group not found')
-      }
-    }),
+      })
+    ),
 
-  updateLoggedFoodAmount: ({ groupId, foodId, displayValue }) =>
-    set((state) => {
-      const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
-
-      if (targetGroup.meals) {
-        const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
-
-        if (targetMeal) {
-          if (displayValue !== undefined) {
-            targetMeal.displayValue = displayValue ?? ''
-          }
+  updateLoggedFoodAmount: ({ foodId, displayValue }) =>
+    set(
+      produce((state) => {
+        if (state.mealsById[foodId]) {
+          state.mealsById[foodId].displayValue = displayValue
         } else {
-          console.warn('target meal not found')
+          devError('foodId not found', foodId)
         }
-      } else {
-        console.warn('target group not found')
-      }
-    }),
+      })
+    ),
+
+  // updateLoggedFoodWithNutrition: (nutritionData) =>
+  //   set((state) => {
+  //     console.log('received nutrition data', nutritionData)
+
+  //     state.loggedFood.forEach((groupMeal) => {
+  //       const enrichedGroup = nutritionData[groupMeal.id]
+  //       if (!enrichedGroup) return
+
+  //       groupMeal.meals.forEach((food) => {
+  //         const enriched = enrichedGroup[food.id]
+  //         if (!enriched) return
+
+  //         // ✅ Safe to mutate via Immer
+  //         food.calories = Number(enriched.calories)
+  //         food.protein = Number(enriched.protein)
+  //       })
+  //     })
+  //   }),
 
   updateLoggedFoodWithNutrition: (nutritionData) =>
-    set((state) => {
-      console.log('received nutrition data', nutritionData)
+    set(
+      produce((state) => {
+        state.badNutritionResponses = []
 
-      state.loggedFood.forEach((groupMeal) => {
-        const enrichedGroup = nutritionData[groupMeal.id]
-        if (!enrichedGroup) return
+        for (const id in nutritionData) {
+          const entry = nutritionData[id]
 
-        groupMeal.meals.forEach((food) => {
-          const enriched = enrichedGroup[food.id]
-          if (!enriched) return
+          if (!state.mealsById[id]) {
+            state.badNutritionResponses.push({ id, ...entry })
+            continue
+          }
 
-          // ✅ Safe to mutate via Immer
-          food.calories = Number(enriched.calories)
-          food.protein = Number(enriched.protein)
-        })
+          if (!entry?.calories && !entry?.protein) {
+            state.badNutritionResponses.push({ id, ...entry })
+            continue
+          }
+
+          Object.assign(state.mealsById[id], {
+            calories: entry.calories,
+            protein: entry.protein,
+          })
+        }
       })
-    }),
+    ),
 
   setFoodBank: (foodObject) =>
     set((prev) => {

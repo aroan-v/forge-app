@@ -1,18 +1,13 @@
-import { InferenceClient } from '@huggingface/inference'
+import { devLog } from '@/lib/logger'
+import { Groq } from 'groq-sdk'
+import { NextResponse } from 'next/server'
 
 export async function POST(req) {
   try {
     const body = await req.json()
+    const groq = new Groq()
 
-    const client = new InferenceClient(process.env.HF_TOKEN)
-
-    // Debugging logs
-    console.log('rawRequest', body)
-    console.log('jsonStringified', JSON.stringify(body))
-
-    const result = await client.chatCompletion({
-      model: 'moonshotai/Kimi-K2-Instruct-0905',
-      provider: 'groq',
+    const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
           role: 'system',
@@ -38,13 +33,24 @@ export async function POST(req) {
           content: JSON.stringify(body),
         },
       ],
+      model: 'gemma2-9b-it',
       temperature: 0.5,
+      max_completion_tokens: 1024,
       top_p: 0.7,
+      stream: false,
+      response_format: {
+        type: 'json_object',
+      },
+      stop: null,
     })
 
-    return new Response(JSON.stringify(result), { status: 200 })
+    const content = chatCompletion.choices[0]?.message?.content
+    devLog('content', content)
+    const result = JSON.parse(content)
+
+    return NextResponse.json(result, { status: 200 })
   } catch (err) {
-    console.error('HF API Error:', err)
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
+    console.error('API Error:', err)
+    return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }

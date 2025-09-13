@@ -41,6 +41,8 @@ function MealTable({ groupId }) {
   // Version Two
   const groupInfo = useFoodStoreVersionTwo((s) => s.groupsById[groupId])
   const deleteMealRow = useFoodStoreVersionTwo((s) => s.deleteMealRow)
+  const addMealRow = useFoodStoreVersionTwo((s) => s.addMealRow)
+  const deleteFoodGroup = useFoodStoreVersionTwo((s) => s.deleteFoodGroup)
 
   devLog('groupInfo', groupInfo)
 
@@ -52,12 +54,10 @@ function MealTable({ groupId }) {
 
   const [rows, setRows] = useState(meals)
   const [deleteMode, setDeleteMode] = useState(false)
-  const addMealRow = useFoodStore((s) => s.addMealRow)
   const updateGroupName = useFoodStore((s) => s.updateGroupName)
 
   const [localMealName, setLocalMealName] = useState(mealName)
   const [isEditingHeader, setIsEditingHeader] = useState(false)
-  const deleteFoodGroup = useFoodStoreVersionTwo((s) => s.deleteFoodGroup)
 
   const handleToggle = () => {
     if (isEditingHeader) {

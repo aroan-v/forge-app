@@ -15,9 +15,8 @@ const MealRow = React.memo(function MealRow({
   handleToggleId,
 }) {
   devLog('MealRowId', id)
-  const updateLoggedFoodName = useFoodStore((s) => s.updateLoggedFoodName)
-  const updateLoggedFoodAmount = useFoodStore((s) => s.updateLoggedFoodAmount)
-
+  const updateLoggedFoodName = useFoodStoreVersionTwo((s) => s.updateLoggedFoodName)
+  const updateLoggedFoodAmount = useFoodStoreVersionTwo((s) => s.updateLoggedFoodAmount)
   const row = useFoodStoreVersionTwo((s) => s.mealsById[id])
   devLog('mealInfo', row)
 
@@ -26,12 +25,16 @@ const MealRow = React.memo(function MealRow({
     return
   }
 
-  function checkUnit({ groupId, foodId, displayValue }) {
+  function checkUnit({ foodId, displayValue }) {
+    devLog('checkUnitFired')
     let checkedDisplayValue = displayValue?.trim()
     if (/^\d+(\.\d+)?$/.test(checkedDisplayValue)) {
       checkedDisplayValue = `${checkedDisplayValue}g`
     }
-    updateLoggedFoodAmount({ groupId, foodId, displayValue: checkedDisplayValue })
+
+    devLog('foodId', foodId)
+    devLog('displayValue', displayValue)
+    updateLoggedFoodAmount({ foodId, displayValue: checkedDisplayValue })
   }
 
   return (
@@ -50,9 +53,7 @@ const MealRow = React.memo(function MealRow({
         <Textarea
           disabled={deleteMode || row.calories != null || row.protein != null}
           value={row.food ?? ''}
-          onChange={(e) =>
-            updateLoggedFoodName({ groupId, foodId: row.id, foodName: e.target.value })
-          }
+          onChange={(e) => updateLoggedFoodName({ groupId, foodId: id, foodName: e.target.value })}
           placeholder="Food"
           className="resize-none"
         />
@@ -61,10 +62,8 @@ const MealRow = React.memo(function MealRow({
         <Textarea
           disabled={deleteMode || row.calories != null || row.protein != null}
           value={row.displayValue ?? ''}
-          onChange={(e) =>
-            updateLoggedFoodAmount({ groupId, foodId: row.id, displayValue: e.target.value })
-          }
-          onBlur={(e) => checkUnit({ groupId, foodId: row.id, displayValue: e.target.value })}
+          onChange={(e) => updateLoggedFoodAmount({ foodId: id, displayValue: e.target.value })}
+          onBlur={(e) => checkUnit({ foodId: id, displayValue: e.target.value })}
           placeholder="0"
           className="resize-none text-center"
         />
