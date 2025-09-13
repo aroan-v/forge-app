@@ -50,23 +50,29 @@ const MealRow = React.memo(function MealRow({
         </TableCell>
       )}
       <TableCell>
-        <Textarea
-          disabled={deleteMode || row.calories != null || row.protein != null}
-          value={row.food ?? ''}
-          onChange={(e) => updateLoggedFoodName({ groupId, foodId: id, foodName: e.target.value })}
-          placeholder="Food"
-          className="resize-none"
-        />
+        <div className={cn('text-area-bg')}>
+          <Textarea
+            disabled={deleteMode || row.calories != null || row.protein != null}
+            value={row.food ?? ''}
+            onChange={(e) =>
+              updateLoggedFoodName({ groupId, foodId: id, foodName: e.target.value })
+            }
+            placeholder="Food"
+            className="resize-none"
+          />
+        </div>
       </TableCell>
       <TableCell>
-        <Textarea
-          disabled={deleteMode || row.calories != null || row.protein != null}
-          value={row.displayValue ?? ''}
-          onChange={(e) => updateLoggedFoodAmount({ foodId: id, displayValue: e.target.value })}
-          onBlur={(e) => checkUnit({ foodId: id, displayValue: e.target.value })}
-          placeholder="0"
-          className="resize-none text-center"
-        />
+        <div className={cn('text-area-bg')}>
+          <Textarea
+            disabled={deleteMode || row.calories != null || row.protein != null}
+            value={row.displayValue ?? ''}
+            onChange={(e) => updateLoggedFoodAmount({ foodId: id, displayValue: e.target.value })}
+            onBlur={(e) => checkUnit({ foodId: id, displayValue: e.target.value })}
+            placeholder="0"
+            className="resize-none text-center"
+          />
+        </div>
       </TableCell>
       <TableCell className="text-primary max-w-[50px] text-center leading-tight">
         {row.calories ?? '-'} <br />
