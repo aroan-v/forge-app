@@ -14,7 +14,6 @@ import { Bot } from 'lucide-react'
 import { useStatsStore } from '@/app/store/useStatsStore'
 import { generateUserStats } from '@/lib/nutritionUtils'
 import UserStats from '../UserStats'
-import { useFoodStore } from '@/app/store/useFoodStore'
 
 export default function MacroSetupForm() {
   // Local form states

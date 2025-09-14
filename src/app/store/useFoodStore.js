@@ -267,42 +267,6 @@ export const useFoodStore = create(
 )
 
 export const useFoodStoreVersionTwo = create((set, get) => ({
-  loggedFood: [
-    {
-      name: 'Breakfast version two',
-      id: 'breakfast_silog232',
-      meals: [
-        {
-          food: 'Garlic Fried Rice (Sinangag)',
-          value: 200, // grams
-          unit: 'g',
-          id: 'sinangag2023',
-          displayValue: '200 g',
-        },
-        {
-          food: 'Fried Egg',
-          value: 2, // 2 pcs
-          unit: 'pcs',
-          id: 'itlog2023',
-          displayValue: '2 pcs',
-        },
-        {
-          food: 'Longganisa (Sweet Pork Sausage)',
-          value: 3, // 3 pcs
-          unit: 'pcs',
-          displayValue: '3 pcs',
-        },
-        {
-          food: 'Tomato & Cucumber Side Salad',
-          value: 100, // grams
-          unit: 'g',
-          id: 'ensalada2023',
-          displayValue: '100 g',
-        },
-      ],
-    },
-  ],
-
   foodGroups: ['breakfast_silog232'],
 
   badNutritionResponses: [],
@@ -438,13 +402,15 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
   },
 
   updateGroupName: ({ groupId, groupName }) =>
-    set((state) => {
-      const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
+    set(
+      produce((state) => {
+        const targetGroup = state.groupsById[groupId]
 
-      if (targetGroup) {
-        targetGroup.name = groupName
-      }
-    }),
+        if (targetGroup) {
+          targetGroup.name = groupName
+        }
+      })
+    ),
 
   updateLoggedFoodName: ({ foodId, foodName }) =>
     set(

@@ -47,39 +47,25 @@ function MealTable({ groupId }) {
   devLog('groupInfo', groupInfo)
 
   const meals = []
-  const mealName = groupInfo?.name
+  const groupName = groupInfo?.name
   const mealIds = groupInfo?.mealIds
   const totalCalories = groupInfo?.totalCalories || 0
   const totalProtein = groupInfo?.totalProtein || 0
 
   devLog('mealIds', mealIds)
 
-  const [rows, setRows] = useState(meals)
   const [deleteMode, setDeleteMode] = useState(false)
-  const updateGroupName = useFoodStore((s) => s.updateGroupName)
 
-  const [localMealName, setLocalMealName] = useState(mealName)
   const [isEditingHeader, setIsEditingHeader] = useState(false)
+  const updateGroupName = useFoodStoreVersionTwo((s) => s.updateGroupName)
 
-  const handleToggle = () => {
+  const handleSave = (groupName) => {
     if (isEditingHeader) {
-      // save logic can go here if needed
-      console.log('Saved:', localMealName)
-      updateGroupName({ groupId, groupName: localMealName })
+      console.log('Saved:', groupName)
+      updateGroupName({ groupId, groupName })
     }
     setIsEditingHeader(!isEditingHeader)
   }
-
-  // This is for better UX, automatically focuses on the header input when changing the group name
-  const inputRef = useRef(null)
-  useEffect(() => {
-    if (isEditingHeader && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus()
-        inputRef.current?.select()
-      }, 500)
-    }
-  }, [isEditingHeader])
 
   // Handle Toggling of rows to delete
   const [idsToDelete, setIdsToDelete] = useState([])
@@ -95,20 +81,6 @@ function MealTable({ groupId }) {
 
   devLog('idsToDelete', idsToDelete)
 
-  // Handle input changes for local states
-  const handleChange = ({ foodId, field, value }) => {
-    setRows((prev) =>
-      prev.map((food) => {
-        if (food.id !== foodId) {
-          return food
-        }
-        const updatedFood = { ...food }
-        updatedFood[field] = value
-        return updatedFood
-      })
-    )
-  }
-
   return (
     <motion.div
       animate={{ height: 'auto' }}
@@ -122,40 +94,13 @@ function MealTable({ groupId }) {
           onDelete={() => deleteFoodGroup(groupId)}
         />
       </motion.div>
-      <motion.div layout="size" className="mb-2 flex w-[95%] gap-4 p-2 align-middle">
-        <Input
-          value={localMealName ?? ''}
-          placeholder="Food Group"
-          onChange={(e) => setLocalMealName(e.target.value)}
-          onBlur={() => setIsEditingHeader(false)}
-          ref={inputRef}
-          disabled={!isEditingHeader}
-          className={`custom-ds-input flex-1 text-lg font-semibold ${!localMealName && 'italic'}`}
-        />
 
-        {/* {isEditingHeader && (
-          <Button variant="defaultOutline" size="stretch" onClick={handleToggle}>
-            Save
-          </Button>
-        )} */}
-
-        <AnimatePresence mode="wait">
-          {isEditingHeader && (
-            <MotionButton
-              key="save-btn"
-              initial={{ opacity: 0, y: 8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.95 }}
-              transition={motionTransition}
-              variant="defaultOutline"
-              size="stretch"
-              onClick={handleToggle}
-            >
-              Save
-            </MotionButton>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      <GroupHeader
+        initialVal={groupName}
+        setIsEditingHeader={setIsEditingHeader}
+        isEditingHeader={isEditingHeader}
+        handleSave={handleSave}
+      />
 
       <TableStructure
         deleteMode={deleteMode}
@@ -219,6 +164,7 @@ function MealTable({ groupId }) {
 }
 
 function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
+  devLog('TableStructure rendered')
   return (
     <MotionTable className="w-full table-fixed">
       <MotionTableHeader>
@@ -256,3 +202,50 @@ function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
 }
 
 export default React.memo(MealTable)
+
+function GroupHeader({ initialVal, setIsEditingHeader, isEditingHeader, handleSave }) {
+  const [localGroupName, setLocalGroupName] = React.useState(initialVal)
+
+  // This is for better UX, automatically focuses on the header input when changing the group name
+  const inputRef = React.useRef(null)
+
+  React.useEffect(() => {
+    if (isEditingHeader && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      }, 500)
+    }
+  }, [isEditingHeader])
+
+  return (
+    <motion.div layout="size" className="mb-2 flex w-[95%] gap-4 p-2 align-middle">
+      <Input
+        value={localGroupName ?? ''}
+        placeholder="Food Group"
+        onChange={(e) => setLocalGroupName(e.target.value)}
+        onBlur={() => setIsEditingHeader(false)}
+        ref={inputRef}
+        disabled={!isEditingHeader}
+        className={`custom-ds-input flex-1 text-lg font-semibold ${!localGroupName && 'italic'}`}
+      />
+
+      <AnimatePresence mode="wait">
+        {isEditingHeader && (
+          <MotionButton
+            key="save-btn"
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+            transition={motionTransition}
+            variant="defaultOutline"
+            size="stretch"
+            onClick={() => handleSave(localGroupName)}
+          >
+            Save
+          </MotionButton>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}

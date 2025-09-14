@@ -3,7 +3,7 @@ import React from 'react'
 import { Button } from '../ui/button'
 
 import { sampleRawData } from '@/app/schemas/foodSchema'
-import { useFoodStore, useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
+import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import SimpleCard from '../SimpleCard'
 import { Bot } from 'lucide-react'
 import { cn } from '@/lib/utils'
