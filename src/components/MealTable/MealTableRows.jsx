@@ -3,6 +3,7 @@ import { useFoodStore, useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import { AnimatePresence } from 'framer-motion'
 import { MotionTableRow, TableCell } from '../ui/table'
 import { cn } from '@/lib/utils'
+import { motion } from 'framer-motion'
 import { Textarea } from '../ui/textarea'
 import { devLog } from '@/lib/logger'
 
@@ -50,7 +51,12 @@ const MealRow = React.memo(function MealRow({
         </TableCell>
       )}
       <TableCell>
-        <div className={cn('text-area-bg')}>
+        <div
+          className={cn(
+            'text-area-bg p-2',
+            (deleteMode || row.calories != null || row.protein != null) && 'disabled'
+          )}
+        >
           <Textarea
             disabled={deleteMode || row.calories != null || row.protein != null}
             value={row.food ?? ''}
@@ -63,7 +69,12 @@ const MealRow = React.memo(function MealRow({
         </div>
       </TableCell>
       <TableCell>
-        <div className={cn('text-area-bg')}>
+        <div
+          className={cn(
+            'text-area-bg p-2',
+            (deleteMode || row.calories != null || row.protein != null) && 'disabled'
+          )}
+        >
           <Textarea
             disabled={deleteMode || row.calories != null || row.protein != null}
             value={row.displayValue ?? ''}

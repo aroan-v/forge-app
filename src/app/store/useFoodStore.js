@@ -311,6 +311,8 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
     breakfast_silog232: {
       name: 'Breakfast Version Two',
       mealIds: ['sinangag2023', 'itlog2023', 'longganisa_123', 'ensalada2023'],
+      totalProtein: null,
+      totalCalories: null,
     },
   },
 
@@ -352,6 +354,8 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
         state.groupsById[newId] = {
           name: '',
           mealIds: [],
+          totalProtein: null,
+          totalCalories: null,
         }
       })
     ),
@@ -505,6 +509,23 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
             calories: entry.calories,
             protein: entry.protein,
           })
+        }
+
+        for (const groupId in state.groupsById) {
+          const mealIds = state.groupsById[groupId].mealIds
+
+          const { totalCalories, totalProtein } = mealIds.reduce(
+            (acc, mealId) => {
+              const meal = state.mealsById[mealId]
+              acc.totalCalories += Number(meal.calories ?? 0)
+              acc.totalProtein += Number(meal.protein ?? 0)
+              return acc
+            },
+            { totalCalories: 0, totalProtein: 0 }
+          )
+
+          state.groupsById[groupId].totalCalories = +totalCalories.toFixed(1)
+          state.groupsById[groupId].totalProtein = +totalProtein.toFixed(1)
         }
       })
     ),

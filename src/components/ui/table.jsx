@@ -88,7 +88,7 @@ function MotionTableRow({ motionId, className, ...props }) {
   return (
     <motion.tr
       key={motionId}
-      layout="position"
+      layout
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
@@ -117,6 +117,7 @@ function TableCell({ className, ...props }) {
   return (
     <motion.td
       layout
+      transition={{ duration: 0.5 }}
       data-slot="table-cell"
       className={cn(
         'p-2 text-center align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',

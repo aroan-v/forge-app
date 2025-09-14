@@ -1,10 +1,11 @@
 import * as React from 'react'
+import TextareaAutosize from 'react-textarea-autosize'
 
 import { cn } from '@/lib/utils'
 
 function Textarea({ className, ...props }) {
   return (
-    <textarea
+    <TextareaAutosize
       data-slot="textarea"
       className={cn(
         // Base classes
@@ -12,7 +13,7 @@ function Textarea({ className, ...props }) {
 
         // Sizing and Spacing
         // 'h-auto min-h-[1.2em] resize-none overflow-auto px-3 py-2',
-        'h-auto resize-none overflow-visible',
+        'resize-none overflow-visible',
 
         // Borders and Appearance
         'rounded-md bg-transparent shadow-xs',

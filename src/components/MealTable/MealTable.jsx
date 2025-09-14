@@ -49,6 +49,8 @@ function MealTable({ groupId }) {
   const meals = []
   const mealName = groupInfo?.name
   const mealIds = groupInfo?.mealIds
+  const totalCalories = groupInfo?.totalCalories || 0
+  const totalProtein = groupInfo?.totalProtein || 0
 
   devLog('mealIds', mealIds)
 
@@ -106,13 +108,6 @@ function MealTable({ groupId }) {
       })
     )
   }
-
-  // ✅ Reduce and round to nearest 0.1
-  const totalCalories =
-    Math.round((meals?.reduce((sum, row) => sum + Number(row.calories ?? 0), 0) ?? 0) * 10) / 10
-
-  const totalProtein =
-    Math.round((meals?.reduce((sum, row) => sum + Number(row.protein ?? 0), 0) ?? 0) * 10) / 10
 
   return (
     <motion.div
