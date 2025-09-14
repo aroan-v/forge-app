@@ -13,7 +13,6 @@ import { devLog } from '@/lib/logger'
 
 export default function Home() {
   const loggedFood = useFoodStoreVersionTwo((s) => s.loggedFood)
-  // const addFoodGroup = useFoodStore((s) => s.addFoodGroup)
   const userComputedStats = useStatsStore((s) => s.userComputedStats)
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
   const foodGroups = useFoodStoreVersionTwo((s) => s.foodGroups)
@@ -25,7 +24,7 @@ export default function Home() {
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
 
-      {/* <TargetsSection /> */}
+      <TargetsSection />
 
       <NutritionNotice />
       {foodGroups.map((id) => (
@@ -124,9 +123,9 @@ function Hero() {
   )
 }
 
-function TargetsSection({ currentCalories, currentProtein }) {
+function TargetsSection({}) {
   const userComputedStats = useStatsStore((s) => s.userComputedStats)
-  const loggedFood = useFoodStore((s) => s.loggedFood)
+  const mealsById = useFoodStoreVersionTwo((s) => s.mealsById)
 
   console.log('userComputedStats', userComputedStats)
 
@@ -138,17 +137,17 @@ function TargetsSection({ currentCalories, currentProtein }) {
     remainingCalories,
     remainingProtein,
   } = React.useMemo(() => {
-    let totals = { totalCalories: 0, totalProtein: 0 }
+    const totals = { totalCalories: 0, totalProtein: 0 }
 
-    loggedFood.forEach((mealGroup) => {
-      mealGroup.meals.forEach((meal) => {
-        totals.totalCalories += meal.calories || 0
-        totals.totalProtein += meal.protein || 0
-      })
-    })
+    for (const id in mealsById) {
+      totals.totalCalories += mealsById[id].calories || 0
+      totals.totalProtein += mealsById[id].protein || 0
+    }
 
     const targetCalories = userComputedStats?.calorieGoal || 1
     const targetProtein = userComputedStats?.proteinTarget || 1
+
+    devLog('running totalCalories soFar', totals.totalCalories)
 
     return {
       totalCalories: totals.totalCalories,
@@ -158,7 +157,7 @@ function TargetsSection({ currentCalories, currentProtein }) {
       remainingCalories: Math.max(targetCalories - totals.totalCalories, 0),
       remainingProtein: Math.max(targetProtein - totals.totalProtein, 0),
     }
-  }, [loggedFood, userComputedStats])
+  }, [mealsById, userComputedStats])
 
   return (
     <div className="flex w-md justify-center gap-4 p-4">
