@@ -10,16 +10,18 @@ import CircularProgress from '@/components/CircularProgress'
 import { BicepsFlexed, Hamburger } from 'lucide-react'
 import { useStatsStore } from './store/useStatsStore'
 import { devLog } from '@/lib/logger'
+import { ConfirmDialogWithTrigger } from '@/components/ConfirmDialog'
+import AccountSetupNotice from '@/components/AccountSetupNotice'
 
 export default function Home() {
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
   const foodGroups = useFoodStoreVersionTwo((s) => s.foodGroups)
 
+  devLog('foodGroups', foodGroups)
+
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
-      <StartFreshSection />
-
       <TargetsSection />
       <NutritionNotice />
       {foodGroups.map((id) => (
@@ -102,15 +104,16 @@ function MealSection() {
 
 function Hero() {
   return (
-    <div className="hero p-6">
-      <div className="hero-content text-center">
+    <div className="ds-hero">
+      <div className="ds-hero-content flex flex-col text-center">
         <div className="max-w-md">
-          <h1 className="text-xl font-bold">{'Track what you ate today!'}</h1>
+          <h1 className="text-primary text-xl font-bold">{'Track what you ate today!'}</h1>
           <p className="py-3">
-            Tell us a bit about yourself—your height, weight, age, and activity level—and we’ll
-            calculate the perfect protein and calorie targets to fuel your day.
+            Simply type in the food you ate and the amount for each. Our AI will instantly calculate
+            the calories and protein, so you can see how each meal contributes to your daily goals.
           </p>
         </div>
+        <StartFreshSection />
       </div>
     </div>
   )
@@ -141,6 +144,7 @@ function TargetsSection({}) {
     const targetProtein = userComputedStats?.proteinTarget || 1
 
     devLog('running totalCalories soFar', totals.totalCalories)
+    devLog('targetProtein', targetProtein)
 
     return {
       totalCalories: totals.totalCalories,
@@ -155,36 +159,46 @@ function TargetsSection({}) {
   devLog('totalCaloriesPercent', totalCaloriesPercent)
 
   return (
-    <div className="flex w-md justify-center gap-4 p-4">
-      <CircularProgress
-        color={'primary'}
-        value={totalCalories}
-        icon={Hamburger}
-        secondValue={remainingCalories}
-        label={'Calories consumed:'}
-        unit={'kcal'}
-        percent={totalCaloriesPercent}
-      />
+    <div>
+      <AccountSetupNotice />
+      <div className="flex w-md justify-center gap-4 p-4">
+        <CircularProgress
+          color={'primary'}
+          value={totalCalories}
+          icon={Hamburger}
+          isNull={userComputedStats == null}
+          secondValue={remainingCalories}
+          label={'Calories consumed:'}
+          unit={'kcal'}
+          percent={totalCaloriesPercent}
+        />
 
-      <CircularProgress
-        color={'secondary'}
-        value={totalProtein}
-        icon={BicepsFlexed}
-        secondValue={remainingProtein}
-        label={'Protein consumed:'}
-        unit={'grams'}
-        percent={totalProteinPercent}
-      />
+        <CircularProgress
+          color={'secondary'}
+          isNull={userComputedStats == null}
+          value={totalProtein}
+          icon={BicepsFlexed}
+          secondValue={remainingProtein}
+          label={'Protein consumed:'}
+          unit={'grams'}
+          percent={totalProteinPercent}
+        />
+      </div>
     </div>
   )
 }
 
-function StartFreshSection({}) {
+function StartFreshSection() {
   const resetData = useFoodStoreVersionTwo((s) => s.resetData)
 
   return (
-    <Button variant="default" onClick={resetData}>
-      Start Fresh
-    </Button>
+    <ConfirmDialogWithTrigger
+      title="Reset All Data?"
+      dialogDescription="This will erase all your meals and groups. Are you sure you want to start fresh?"
+      confirmationContent="Yes, reset"
+      handleConfirmation={resetData}
+    >
+      <Button variant="primaryOutline">Start Fresh</Button>
+    </ConfirmDialogWithTrigger>
   )
 }

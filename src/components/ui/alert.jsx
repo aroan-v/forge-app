@@ -4,11 +4,18 @@ import { cva } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const alertVariants = cva(
-  'relative w-full rounded-lg px-4 py-3 text-sm grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current',
+  // Base styles grouped by function
+  'relative flex flex-col gap-4 items-center text-center ' + // layout
+    'w-full rounded-lg px-4 py-3 text-sm ' + // sizing & spacing
+    'has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] ' + // grid columns
+    'gap-y-2 has-[>svg]:gap-x-3 ' + // gaps
+    '[&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current', // svg styling
+
   {
     variants: {
       variant: {
         default: 'bg-card text-card-foreground',
+        accent: 'bg-accent/10 border-1 border-accent text-white',
         destructive:
           'text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90',
       },
@@ -45,7 +52,7 @@ function AlertDescription({ className, ...props }) {
     <div
       data-slot="alert-description"
       className={cn(
-        'text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed',
+        'text-muted-foreground flex flex-col gap-4 text-sm [&_p]:leading-relaxed',
         className
       )}
       {...props}

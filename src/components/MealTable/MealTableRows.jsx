@@ -89,7 +89,7 @@ const MealRow = React.memo(function MealRow({
         {row.calories ?? '-'} <br />
         <span className="text-muted-foreground/40 text-xs">kcal</span>
       </TableCell>
-      <TableCell className="text-accent text-center leading-tight">
+      <TableCell className="text-secondary text-center leading-tight">
         {row.protein ?? '-'} <br />
         <span className="text-muted-foreground/40 text-xs">grams</span>
       </TableCell>

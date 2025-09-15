@@ -25,13 +25,10 @@ export default function MacroSetupForm() {
   const [activityLevel, setActivityLevel] = useState('moderate')
   const [goal, setGoal] = useState('bulking')
 
-  // Zustand actions
   const setUserData = useStatsStore((state) => state.setUserData)
   const setTargets = useStatsStore((state) => state.setTargets)
   const setShallowState = useStatsStore((state) => state.setShallowState)
   const userComputedStats = useStatsStore((state) => state.userComputedStats)
-
-  console.log('userComputedStats', userComputedStats)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -58,19 +55,11 @@ export default function MacroSetupForm() {
       },
     }
 
-    console.log('payload', rawData)
     const stats = generateUserStats(rawData)
-    console.log('stats', stats)
-
-    console.log(stats)
 
     setShallowState({
       userComputedStats: stats,
     })
-
-    localStorage.setItem('userStats', JSON.stringify(stats))
-
-    console.log('currentState', useStatsStore.getState())
 
     return
 

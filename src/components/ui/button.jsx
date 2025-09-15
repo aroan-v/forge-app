@@ -11,6 +11,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-muted text-muted-foreground shadow-xs hover:bg-muted/90',
+        accent: 'bg-accent/80 text-accent-foreground shadow-xs hover:bg-accent',
 
         destructive: cn(
           'bg-destructive text-destructive-foreground shadow-sm',
@@ -19,8 +20,7 @@ const buttonVariants = cva(
           'disabled:opacity-50 disabled:pointer-events-none'
         ),
 
-        outline:
-          'border border-border bg-background text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        outline: 'border border-muted/50 text-muted-foreground hover:text-white hover:bg-muted/70',
 
         secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
 
@@ -51,11 +51,12 @@ const buttonVariants = cva(
           'disabled:cursor-not-allowed disabled:opacity-50'
         ),
 
-        defaultOutline: 'border border-muted/50 text-muted-foreground hover:bg-muted/70',
+        defaultOutline:
+          'border border-muted/50 text-muted-foreground hover:text-white hover:bg-muted/70',
         primaryOutline:
           'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
         secondaryOutline:
-          'border border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground',
+          'border border-secondary text-secondary hover:bg-secondary/70 hover:text-secondary-foreground',
         accentOutline:
           'border border-accent text-accent hover:bg-accent hover:text-accent-foreground',
         destructiveOutline:

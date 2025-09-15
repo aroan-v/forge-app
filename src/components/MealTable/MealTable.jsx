@@ -35,15 +35,14 @@ import MealTableRows from './MealTableRows'
 import { devLog } from '@/lib/logger'
 
 function MealTable({ groupId }) {
-  devLog('group with an id rendered', groupId)
-  // Declare the initial meals to the local state
+  devLog('MealTable - groupId', groupId)
 
-  // Version Two
   const groupInfo = useFoodStoreVersionTwo((s) => s.groupsById?.[groupId])
   const deleteMealRow = useFoodStoreVersionTwo((s) => s.deleteMealRow)
   const addMealRow = useFoodStoreVersionTwo((s) => s.addMealRow)
 
   devLog('groupInfo', groupInfo)
+  devLog('currentState', useFoodStoreVersionTwo.getState())
 
   const meals = []
   const groupName = groupInfo?.name
@@ -176,7 +175,7 @@ function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
           <TableHead className="w-[150px]">Food</TableHead>
           <TableHead className="w-[100px]">Amount</TableHead>
           <TableHead className="text-primary w-[75px] text-center">Calories</TableHead>
-          <TableHead className="text-accent w-[75px] text-center">Protein</TableHead>
+          <TableHead className="text-secondary w-[75px] text-center">Protein</TableHead>
         </MotionTableRow>
       </MotionTableHeader>
 
@@ -191,7 +190,7 @@ function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
             <span className="text-primary">{totalCalories}kcal</span>
           </TableCell>
           <TableCell className="text-center">
-            <span className="text-accent">{totalProtein}g</span>
+            <span className="text-secondary">{totalProtein}g</span>
           </TableCell>
         </MotionTableRow>
       </TableBody>

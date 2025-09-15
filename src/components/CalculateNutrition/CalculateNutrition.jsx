@@ -158,7 +158,7 @@ function CalculateNutrition() {
         </span>
       </Button>
       <p className="text-muted-foreground text-xs">
-        Powered by <code className="font-mono">moonshotai/Kimi-K2-Instruct-0905</code> on{' '}
+        Powered by <code className="font-mono">gemma2-9b-it</code> on{' '}
         <code className="font-mono">groq</code>
       </p>
 

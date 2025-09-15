@@ -10,7 +10,6 @@ export default function SetupPage() {
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       {/* Name Input */} <Hero />
       {!isLoading && <MacroSetupForm />}
-      {/* <UserSetupForm /> */}
     </DaisyThemeWrapper>
   )
 }

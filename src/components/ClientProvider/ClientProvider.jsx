@@ -11,24 +11,29 @@ function ClientProvider({ children }) {
   const resetSignal = useFoodStoreVersionTwo((s) => s.resetSignal)
 
   React.useEffect(() => {
-    const savedStats = localStorage.getItem('userStats')
+    const savedPersonalStats = localStorage.getItem('userStats')
 
-    if (savedStats) {
-      setShallowState({ userComputedStats: JSON.parse(savedStats) })
+    devLog('savedStats', savedPersonalStats)
+
+    if (savedPersonalStats) {
+      setShallowState({ userComputedStats: JSON.parse(savedPersonalStats) })
     }
 
-    const groupsById = localStorage.getItem('groupsById')
-    const mealsById = localStorage.getItem('mealsById')
+    const groupsById = JSON.parse(localStorage.getItem('groupsById'))
+    const mealsById = JSON.parse(localStorage.getItem('mealsById'))
 
     devLog('groupsById', groupsById)
     devLog('mealsById', mealsById)
 
-    if (groupsById && mealsById) {
-      hydrate({
-        groupsById: JSON.parse(groupsById),
-        mealsById: JSON.parse(mealsById),
-      })
+    if (
+      groupsById &&
+      Object.keys(groupsById).length > 0 &&
+      mealsById &&
+      Object.keys(mealsById).length > 0
+    ) {
+      hydrate({ groupsById, mealsById })
     } else {
+      devLog('keys not found - initializing')
       addFoodGroup()
     }
 

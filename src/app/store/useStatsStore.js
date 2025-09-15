@@ -3,24 +3,20 @@ import { immer } from 'zustand/middleware/immer'
 
 export const useStatsStore = create(
   immer((set, get) => ({
-    // User’s submitted profile info (age, height, weight, gender, etc.)
     userData: {},
     userComputedStats: null,
     isLoading: true,
 
-    // AI-calculated daily goals
     targetNutrients: {
       targetCalories: null,
       targetProtein: null,
     },
 
-    // Running totals for today
     currentNutrients: {
       currentCalories: 0,
       currentProtein: 0,
     },
 
-    // Actions
     setUserData: (data) =>
       set((state) => {
         state.userData = data

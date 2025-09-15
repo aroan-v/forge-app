@@ -4,9 +4,29 @@ import { buildStyles, CircularProgressbarWithChildren } from 'react-circular-pro
 import 'react-circular-progressbar/dist/styles.css'
 import CountUp from 'react-countup'
 
+const colorVariants = {
+  primary: {
+    bg: 'bg-primary/20',
+    text: 'text-primary',
+  },
+  secondary: {
+    bg: 'bg-secondary/20',
+    text: 'text-secondary',
+  },
+  destructive: {
+    bg: 'bg-destructive/20',
+    text: 'text-destructive',
+  },
+  default: {
+    bg: 'bg-neutral/20',
+    text: 'text-neutral',
+  },
+}
+
 function CircularProgress({
   percent,
-  color = 'primary',
+  isNull,
+  color,
   value = 0,
   secondValue,
   icon: Icon,
@@ -14,6 +34,7 @@ function CircularProgress({
   unit,
 }) {
   const [progress, setProgress] = React.useState(0)
+  const variant = colorVariants[color] || colorVariants.default
 
   React.useEffect(() => {
     // Animate from 0 → target value
@@ -24,14 +45,17 @@ function CircularProgress({
   return (
     <div
       className={cn(
-        `text-${color} bg-${color}/10`,
+        variant.text,
+        variant.bg,
         'mt-6 inline-flex flex-col items-center rounded-full text-xl leading-tight font-bold'
       )}
     >
       <CircularProgressbarWithChildren
         strokeWidth={5}
         styles={buildStyles({
-          pathColor: `var(--${color})`,
+          pathColor: isNull
+            ? `rgba(var(--${color}-rgb), 0.2)` // 20% opacity
+            : `var(--${color})`,
           trailColor: 'var(--color-base-200)',
         })}
         value={progress}

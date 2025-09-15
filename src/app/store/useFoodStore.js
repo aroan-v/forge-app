@@ -267,19 +267,16 @@ export const useFoodStore = create(
 )
 
 export const useFoodStoreVersionTwo = create((set, get) => ({
-  foodGroups: ['breakfast_silog232'],
-
   badNutritionResponses: [],
-
+  foodGroups: ['breakfast_silog232'],
   groupsById: {
     breakfast_silog232: {
-      name: 'Breakfast Version Two',
+      name: 'Breakfast',
       mealIds: ['sinangag2023', 'itlog2023', 'longganisa_123', 'ensalada2023'],
       totalProtein: null,
       totalCalories: null,
     },
   },
-
   mealsById: {
     sinangag2023: {
       food: 'Garlic Fried Rice (Sinangag)',
@@ -294,16 +291,16 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
       displayValue: '2 pcs',
     },
     longganisa_123: {
-      food: 'Longganisa (Sweet Pork Sausage)',
+      food: 'Longganisa',
       value: 3,
       unit: 'pcs',
       displayValue: '3 pcs',
     },
     ensalada2023: {
-      food: 'Tomato & Cucumber Side Salad',
-      value: 100,
-      unit: 'g',
-      displayValue: '100 g',
+      food: 'Pandesal',
+      value: 5,
+      unit: 'pcs',
+      displayValue: '5 pcs',
     },
   },
 
@@ -312,6 +309,7 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
   addFoodGroup: () =>
     set(
       produce((state) => {
+        devLog('addFoodGroupInvoked')
         const groupId = nanoid()
         const mealId = nanoid()
 
@@ -408,7 +406,10 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
   },
 
   hydrate: ({ groupsById, mealsById }) => {
+    devLog('hydrate', groupsById, mealsById)
+
     set({
+      foodGroups: Object.keys(groupsById),
       groupsById,
       mealsById,
     })
