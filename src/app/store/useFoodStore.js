@@ -309,17 +309,31 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
 
   foodBank: {},
 
+  saveToLocalStorage: () => {
+    const state = get()
+    localStorage.setItem('mealsById', JSON.stringify(state.mealsById))
+    localStorage.setItem('groupsById', JSON.stringify(state.groupsById))
+  },
+
   addFoodGroup: () =>
     set(
       produce((state) => {
-        const newId = nanoid()
+        const groupId = nanoid()
+        const mealId = nanoid()
 
-        state.foodGroups.push(newId)
-        state.groupsById[newId] = {
+        state.foodGroups.push(groupId)
+        state.groupsById[groupId] = {
           name: '',
-          mealIds: [],
-          totalProtein: null,
-          totalCalories: null,
+          mealIds: [mealId],
+          totalProtein: 0,
+          totalCalories: 0,
+        }
+
+        state.mealsById[mealId] = {
+          food: '',
+          value: null,
+          unit: '',
+          displayValue: '',
         }
       })
     ),
@@ -379,6 +393,17 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
         }
       })
     )
+  },
+
+  resetData: () => {
+    set(() => {})
+  },
+
+  hydrate: ({ groupsById, mealsById }) => {
+    set({
+      groupsById,
+      mealsById,
+    })
   },
 
   getUnregisteredFoods: () => {
@@ -460,6 +485,8 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
 
         for (const id in nutritionData) {
           const entry = nutritionData[id]
+
+          devLog('entry', entry)
 
           if (!state.mealsById[id]) {
             state.badNutritionResponses.push({ id, ...entry })

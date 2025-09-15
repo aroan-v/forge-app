@@ -18,6 +18,7 @@ function CalculateNutrition() {
 
   const getUnregisteredFoods = useFoodStoreVersionTwo((s) => s.getUnregisteredFoods)
   const badNutritionResponses = useFoodStoreVersionTwo((s) => s.badNutritionResponses)
+  const saveToLocalStorage = useFoodStoreVersionTwo((s) => s.saveToLocalStorage)
 
   const updateLoggedFoodWithNutrition = useFoodStoreVersionTwo(
     (s) => s.updateLoggedFoodWithNutrition
@@ -101,6 +102,7 @@ function CalculateNutrition() {
 
       if (data) {
         updateLoggedFoodWithNutrition(data)
+        saveToLocalStorage()
         devLog('updatedLoggedFood', data)
         setContent('Nutrition data updated successfully ✅')
       } else {
@@ -187,6 +189,7 @@ function CalculateNutrition() {
 export default CalculateNutrition
 
 function BadResponsesSection({ data = [] }) {
+  devLog('badResponseData', data)
   return (
     <Card>
       <h4 className="font-bold">Skipped Foods</h4>

@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/select'
 import SettingsAction from '../SettingsAction'
 import { UNITS, UNIT_TYPES, sampleData, templateData } from '@/app/schemas/foodSchema'
-import { useFoodStore, useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
+import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import { Textarea } from '../ui/textarea'
 import { cn } from '@/lib/utils'
 import MealTableRows from './MealTableRows'
@@ -39,10 +39,9 @@ function MealTable({ groupId }) {
   // Declare the initial meals to the local state
 
   // Version Two
-  const groupInfo = useFoodStoreVersionTwo((s) => s.groupsById[groupId])
+  const groupInfo = useFoodStoreVersionTwo((s) => s.groupsById?.[groupId])
   const deleteMealRow = useFoodStoreVersionTwo((s) => s.deleteMealRow)
   const addMealRow = useFoodStoreVersionTwo((s) => s.addMealRow)
-  const deleteFoodGroup = useFoodStoreVersionTwo((s) => s.deleteFoodGroup)
 
   devLog('groupInfo', groupInfo)
 
@@ -81,6 +80,9 @@ function MealTable({ groupId }) {
 
   devLog('idsToDelete', idsToDelete)
 
+  // Early return
+  if (!groupInfo) return
+
   return (
     <motion.div
       animate={{ height: 'auto' }}
@@ -89,10 +91,7 @@ function MealTable({ groupId }) {
       className="bg-base-200 relative w-full max-w-xl overflow-scroll rounded-md p-4"
     >
       <motion.div layout className="absolute top-6 right-2 -translate-y-1/2">
-        <SettingsAction
-          onEdit={() => setIsEditingHeader(true)}
-          onDelete={() => deleteFoodGroup(groupId)}
-        />
+        <SettingsAction groupId={groupId} onEdit={() => setIsEditingHeader(true)} />
       </motion.div>
 
       <GroupHeader
@@ -184,7 +183,6 @@ function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
       <TableBody>
         {children}
 
-        {/* ✅ Running total row */}
         <MotionTableRow className="bg-muted/20 font-semibold">
           <TableCell></TableCell>
           {deleteMode && <TableCell></TableCell>}

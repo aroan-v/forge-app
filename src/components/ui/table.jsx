@@ -116,7 +116,7 @@ function TableHead({ className, ...props }) {
 function TableCell({ className, ...props }) {
   return (
     <motion.td
-      layout
+      layout="position"
       transition={{ duration: 0.5 }}
       data-slot="table-cell"
       className={cn(

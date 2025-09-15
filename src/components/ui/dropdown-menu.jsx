@@ -100,6 +100,54 @@ function DropdownMenuItem({ className, inset, variant = 'default', ...props }) {
   )
 }
 
+function DivDropdownMenuItem({ variant, className, ...props }) {
+  return (
+    <div
+      data-variant={variant}
+      className={cn(
+        // Layout & positioning
+        'relative flex items-center gap-2',
+
+        // Spacing
+        'rounded-sm px-2 py-1.5',
+
+        // Typography
+        'text-sm select-none',
+
+        // Borders & outline
+        'outline-hidden',
+
+        // State: focus
+        'focus:bg-neutral/30 focus:text-neutral-foreground',
+
+        // State: destructive variant
+        'data-[variant=destructive]:text-destructive',
+        'data-[variant=destructive]:focus:bg-destructive/10',
+        'dark:data-[variant=destructive]:focus:bg-destructive/20',
+        'data-[variant=destructive]:focus:text-destructive',
+        'data-[variant=destructive]:*:[svg]:!text-destructive',
+
+        // State: disabled
+        'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+
+        // State: inset
+        'data-[inset]:pl-8',
+
+        // Cursor
+        'cursor-default',
+
+        // SVG styling
+        '[&_svg]:pointer-events-none [&_svg]:shrink-0',
+        "[&_svg:not([class*='text-'])]:text-muted-foreground",
+        "[&_svg:not([class*='size-'])]:size-4",
+
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
 function DropdownMenuCheckboxItem({ className, children, checked, ...props }) {
   return (
     <DropdownMenuPrimitive.CheckboxItem
@@ -226,4 +274,5 @@ export {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DivDropdownMenuItem,
 }

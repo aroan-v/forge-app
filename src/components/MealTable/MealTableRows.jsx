@@ -1,5 +1,5 @@
 import React from 'react'
-import { useFoodStore, useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
+import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import { AnimatePresence } from 'framer-motion'
 import { MotionTableRow, TableCell } from '../ui/table'
 import { cn } from '@/lib/utils'

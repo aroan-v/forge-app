@@ -12,20 +12,14 @@ import { useStatsStore } from './store/useStatsStore'
 import { devLog } from '@/lib/logger'
 
 export default function Home() {
-  const loggedFood = useFoodStoreVersionTwo((s) => s.loggedFood)
-  const userComputedStats = useStatsStore((s) => s.userComputedStats)
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
   const foodGroups = useFoodStoreVersionTwo((s) => s.foodGroups)
-
-  console.log('loggedFood', loggedFood)
-  devLog('foodGroups', foodGroups)
 
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
 
       <TargetsSection />
-
       <NutritionNotice />
       {foodGroups.map((id) => (
         <MealTable key={id} groupId={id} />
@@ -36,7 +30,9 @@ export default function Home() {
       </Button>
       <CalculateNutrition />
 
-      {/* ✅ New Group Button */}
+      <Button variant="default" onClick={addFoodGroup}>
+        Start Fresh
+      </Button>
     </DaisyThemeWrapper>
   )
 }
@@ -158,6 +154,8 @@ function TargetsSection({}) {
       remainingProtein: Math.max(targetProtein - totals.totalProtein, 0),
     }
   }, [mealsById, userComputedStats])
+
+  devLog('totalCaloriesPercent', totalCaloriesPercent)
 
   return (
     <div className="flex w-md justify-center gap-4 p-4">
