@@ -18,6 +18,7 @@ export default function Home() {
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero />
+      <StartFreshSection />
 
       <TargetsSection />
       <NutritionNotice />
@@ -29,10 +30,6 @@ export default function Home() {
         + Add New Group
       </Button>
       <CalculateNutrition />
-
-      <Button variant="default" onClick={addFoodGroup}>
-        Start Fresh
-      </Button>
     </DaisyThemeWrapper>
   )
 }
@@ -179,5 +176,15 @@ function TargetsSection({}) {
         percent={totalProteinPercent}
       />
     </div>
+  )
+}
+
+function StartFreshSection({}) {
+  const resetData = useFoodStoreVersionTwo((s) => s.resetData)
+
+  return (
+    <Button variant="default" onClick={resetData}>
+      Start Fresh
+    </Button>
   )
 }

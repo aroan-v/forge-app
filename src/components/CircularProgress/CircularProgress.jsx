@@ -42,17 +42,17 @@ function CircularProgress({
         {secondValue ? (
           <>
             <div className="text-base font-bold">
-              <CountUp start={0} end={value} duration={3} /> {unit}
+              <CountUp start={0} end={value} duration={2} /> {unit}
             </div>
 
             <div className="text-foreground/40 text-center text-sm font-medium">
               -- <br />
-              <CountUp start={0} end={secondValue} duration={3} /> {unit} left
+              <CountUp start={0} end={secondValue} duration={2} /> {unit} left
             </div>
           </>
         ) : (
           <div className="text-foreground text-base font-bold">
-            <CountUp start={0} end={value} duration={3} /> {unit}
+            <CountUp start={0} end={value} duration={2} /> {unit}
           </div>
         )}
       </CircularProgressbarWithChildren>

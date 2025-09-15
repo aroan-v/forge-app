@@ -8,6 +8,7 @@ function ClientProvider({ children }) {
   const setShallowState = useStatsStore((s) => s.setShallowState)
   const hydrate = useFoodStoreVersionTwo((s) => s.hydrate)
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
+  const resetSignal = useFoodStoreVersionTwo((s) => s.resetSignal)
 
   React.useEffect(() => {
     const savedStats = localStorage.getItem('userStats')
@@ -35,6 +36,13 @@ function ClientProvider({ children }) {
       isLoading: false,
     })
   }, [setShallowState, addFoodGroup, hydrate])
+
+  React.useEffect(() => {
+    if (resetSignal > 0) {
+      localStorage.setItem('mealsById', JSON.stringify({}))
+      localStorage.setItem('groupsById', JSON.stringify({}))
+    }
+  }, [resetSignal])
 
   return <>{children}</>
 }

@@ -309,12 +309,6 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
 
   foodBank: {},
 
-  saveToLocalStorage: () => {
-    const state = get()
-    localStorage.setItem('mealsById', JSON.stringify(state.mealsById))
-    localStorage.setItem('groupsById', JSON.stringify(state.groupsById))
-  },
-
   addFoodGroup: () =>
     set(
       produce((state) => {
@@ -395,8 +389,22 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
     )
   },
 
+  saveToLocalStorage: () => {
+    const state = get()
+    localStorage.setItem('mealsById', JSON.stringify(state.mealsById))
+    localStorage.setItem('groupsById', JSON.stringify(state.groupsById))
+  },
+
+  resetSignal: 0,
+
   resetData: () => {
-    set(() => {})
+    set({
+      foodGroups: [],
+      groupsById: {},
+      mealsById: {},
+      resetSignal: get().resetSignal + 1,
+    })
+    get().addFoodGroup()
   },
 
   hydrate: ({ groupsById, mealsById }) => {
