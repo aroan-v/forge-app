@@ -16,13 +16,10 @@ function CircularProgress({
   const [progress, setProgress] = React.useState(0)
 
   React.useEffect(() => {
-    if (!value) return
     // Animate from 0 → target value
     const animation = setTimeout(() => setProgress(percent), 500)
     return () => clearTimeout(animation)
   }, [value, percent])
-
-  console.log('progress', progress)
 
   return (
     <div
