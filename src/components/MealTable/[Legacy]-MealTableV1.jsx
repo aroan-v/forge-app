@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { UNITS, UNIT_TYPES, sampleData, templateData } from '@/app/schemas/foodSchema'
+import { UNITS, sampleData, templateData } from '@/app/schemas/foodSchema'
 
 export default function MealTable({ mealName = 'Breakfast' }) {
   const [rows, setRows] = useState(() =>
@@ -28,8 +28,6 @@ export default function MealTable({ mealName = 'Breakfast' }) {
       return meal
     })
   )
-
-  console.log('rows', rows)
 
   // Add a new empty row
   const addRow = () => {

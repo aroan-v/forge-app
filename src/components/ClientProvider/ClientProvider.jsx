@@ -2,7 +2,6 @@
 import React from 'react'
 import { useStatsStore } from '@/app/store/useStatsStore'
 import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
-import { devLog } from '@/lib/logger'
 
 function ClientProvider({ children }) {
   const setShallowState = useStatsStore((s) => s.setShallowState)

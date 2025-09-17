@@ -6,10 +6,6 @@ export async function POST(req) {
 
     const client = new InferenceClient(process.env.HF_TOKEN)
 
-    // Debugging logs
-    console.log('rawRequest', body)
-    console.log('jsonStringified', JSON.stringify(body))
-
     const result = await client.chatCompletion({
       model: 'moonshotai/Kimi-K2-Instruct-0905',
       provider: 'groq',

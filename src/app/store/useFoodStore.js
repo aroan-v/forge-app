@@ -1,9 +1,8 @@
-import { PcCase } from 'lucide-react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { nanoid } from 'nanoid'
 import { devError, devLog } from '@/lib/logger'
-import { current, produce } from 'immer'
+import { produce } from 'immer'
 
 export const useFoodStore = create(
   immer((set, get) => ({
@@ -132,8 +131,6 @@ export const useFoodStore = create(
         if (targetGroup.meals) {
           const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
 
-          console.log('targetMeal', targetMeal)
-
           if (targetMeal) {
             if (foodName !== undefined) {
               targetMeal.food = foodName ?? ''
@@ -167,8 +164,6 @@ export const useFoodStore = create(
 
     updateLoggedFoodWithNutrition: (nutritionData) =>
       set((state) => {
-        console.log('received nutrition data', nutritionData)
-
         state.loggedFood.forEach((groupMeal) => {
           const enrichedGroup = nutritionData[groupMeal.id]
           if (!enrichedGroup) return
@@ -191,7 +186,6 @@ export const useFoodStore = create(
           return prev
         }
 
-        console.log('foodObject recieved', foodObject)
         const newFoodBank = { ...prev.foodBank }
 
         // Expected format of foodObject
@@ -241,9 +235,6 @@ export const useFoodStore = create(
         */
 
         for (const food in foodObject) {
-          console.log('logging food:', food)
-          //   check if the food already exists
-
           const foodData = foodObject[food]
 
           if (!newFoodBank[food]) {
@@ -468,25 +459,6 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
       })
     ),
 
-  // updateLoggedFoodWithNutrition: (nutritionData) =>
-  //   set((state) => {
-  //     console.log('received nutrition data', nutritionData)
-
-  //     state.loggedFood.forEach((groupMeal) => {
-  //       const enrichedGroup = nutritionData[groupMeal.id]
-  //       if (!enrichedGroup) return
-
-  //       groupMeal.meals.forEach((food) => {
-  //         const enriched = enrichedGroup[food.id]
-  //         if (!enriched) return
-
-  //         // ✅ Safe to mutate via Immer
-  //         food.calories = Number(enriched.calories)
-  //         food.protein = Number(enriched.protein)
-  //       })
-  //     })
-  //   }),
-
   updateLoggedFoodWithNutrition: (nutritionData) =>
     set(
       produce((state) => {
@@ -539,7 +511,6 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
         return prev
       }
 
-      console.log('foodObject recieved', foodObject)
       const newFoodBank = { ...prev.foodBank }
 
       // Expected format of foodObject
@@ -589,9 +560,6 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
         */
 
       for (const food in foodObject) {
-        console.log('logging food:', food)
-        //   check if the food already exists
-
         const foodData = foodObject[food]
 
         if (!newFoodBank[food]) {

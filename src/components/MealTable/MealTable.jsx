@@ -1,36 +1,23 @@
 'use client'
 import React from 'react'
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import {
-  Table,
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
-  TableRow,
   MotionTableRow,
-  MotionTableBody,
   MotionTable,
   MotionTableHeader,
 } from '@/components/ui/table'
 import { Button, MotionButton } from '@/components/ui/button'
 import { Input } from '../ui/input'
-import { CircleX, SquarePen, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { motionTransition } from '@/constants/constants'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import SettingsAction from '../SettingsAction'
-import { UNITS, UNIT_TYPES, sampleData, templateData } from '@/app/schemas/foodSchema'
+import { UNITS } from '@/app/schemas/foodSchema'
 import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
-import { Textarea } from '../ui/textarea'
-import { cn } from '@/lib/utils'
 import MealTableRows from './MealTableRows'
 import { devLog } from '@/lib/logger'
 
@@ -59,7 +46,6 @@ function MealTable({ groupId }) {
 
   const handleSave = (groupName) => {
     if (isEditingHeader) {
-      console.log('Saved:', groupName)
       updateGroupName({ groupId, groupName })
     }
     setIsEditingHeader(!isEditingHeader)

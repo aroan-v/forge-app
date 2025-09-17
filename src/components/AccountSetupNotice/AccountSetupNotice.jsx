@@ -2,7 +2,6 @@ import React from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Info } from 'lucide-react'
 import { useStatsStore } from '@/app/store/useStatsStore'
-import { devLog } from '@/lib/logger'
 import { Button } from '../ui/button'
 import Link from 'next/link'
 

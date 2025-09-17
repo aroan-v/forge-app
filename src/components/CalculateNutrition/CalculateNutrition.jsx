@@ -1,12 +1,8 @@
 'use client'
 import React from 'react'
 import { Button } from '../ui/button'
-
-import { sampleRawData } from '@/app/schemas/foodSchema'
 import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
-import SimpleCard from '../SimpleCard'
 import { Bot } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { devLog } from '@/lib/logger'
 import { Card } from '../ui/card'
 
@@ -48,8 +44,6 @@ function CalculateNutrition({ ref }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(unregisteredFoods),
       })
-
-      console.log('passed unregistered food to AI', unregisteredFoods)
 
       devLog('resonseReceived', res)
 

@@ -3,7 +3,6 @@ import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import { AnimatePresence } from 'framer-motion'
 import { MotionTableRow, TableCell } from '../ui/table'
 import { cn } from '@/lib/utils'
-import { motion } from 'framer-motion'
 import { Textarea } from '../ui/textarea'
 import { devLog } from '@/lib/logger'
 

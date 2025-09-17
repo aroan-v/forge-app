@@ -10,7 +10,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog'
 import { Button } from '../ui/button'
-import { isValidElement, cloneElement } from 'react'
+import { isValidElement } from 'react'
 
 function ConfirmDialogWithTrigger({
   title,

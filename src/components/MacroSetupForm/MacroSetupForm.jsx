@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,10 +10,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import DaisyThemeWrapper from '../DaisyThemeWrapper'
-import { Bot } from 'lucide-react'
 import { useStatsStore } from '@/app/store/useStatsStore'
 import { generateUserStats } from '@/lib/nutritionUtils'
-import UserStats from '../UserStats'
 import { devLog } from '@/lib/logger'
 
 export default function MacroSetupForm({ scrollToTargetRef }) {
@@ -92,11 +90,8 @@ export default function MacroSetupForm({ scrollToTargetRef }) {
         parsedContent = null
       }
 
-      console.log('parsedContent:', parsedContent)
-
       if (parsedContent) {
         setTargets(parsedContent) // { targetCalories, targetProtein }
-        console.log('✅ AI Targets set', parsedContent)
       }
     } catch (err) {
       console.error('❌ Error fetching AI targets:', err)

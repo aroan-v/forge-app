@@ -3,7 +3,7 @@ import CalculateNutrition from '@/components/CalculateNutrition'
 import DaisyThemeWrapper from '@/components/DaisyThemeWrapper'
 import MealTable from '@/components/MealTable'
 import { Button } from '@/components/ui/button'
-import React, { use } from 'react'
+import React from 'react'
 import { useFoodStoreVersionTwo } from './store/useFoodStore'
 import { NutritionNotice } from '@/components/NutritionNotice'
 import CircularProgress from '@/components/CircularProgress'
@@ -14,7 +14,6 @@ import { ConfirmDialogWithTrigger } from '@/components/ConfirmDialog'
 import AccountSetupNotice from '@/components/AccountSetupNotice'
 import Hero from '@/components/Hero'
 import Link from 'next/link'
-import Spinner from '@/components/Spinner'
 
 export default function Home() {
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
@@ -129,8 +128,6 @@ function MealSection() {
 function TargetsSection({ ref }) {
   let userComputedStats = useStatsStore((s) => s.userComputedStats)
   const mealsById = useFoodStoreVersionTwo((s) => s.mealsById)
-
-  console.log('userComputedStats', userComputedStats)
 
   const {
     totalCalories,
