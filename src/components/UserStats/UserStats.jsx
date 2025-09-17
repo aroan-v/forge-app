@@ -99,7 +99,7 @@ export default function UserStats({ stats }) {
       <div className="flex w-md justify-center gap-4 p-4">
         <CircularProgress
           color={'primary'}
-          value={stats.calorieGoal}
+          totalValue={stats.calorieGoal}
           icon={Hamburger}
           label={'Your target calories:'}
           unit={'kcal'}
@@ -107,7 +107,7 @@ export default function UserStats({ stats }) {
 
         <CircularProgress
           color={'secondary'}
-          value={stats.proteinTarget}
+          totalValue={stats.proteinTarget}
           icon={BicepsFlexed}
           label={'Your target protein:'}
           unit={'grams'}

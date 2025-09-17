@@ -127,7 +127,7 @@ function MealSection() {
 }
 
 function TargetsSection({ ref }) {
-  const userComputedStats = useStatsStore((s) => s.userComputedStats)
+  let userComputedStats = useStatsStore((s) => s.userComputedStats)
   const mealsById = useFoodStoreVersionTwo((s) => s.mealsById)
 
   console.log('userComputedStats', userComputedStats)
@@ -139,6 +139,10 @@ function TargetsSection({ ref }) {
     totalProteinPercent,
     remainingCalories,
     remainingProtein,
+    isOverCaloriesTarget,
+    isOverProteinTarget,
+    overCalories,
+    overProtein,
   } = React.useMemo(() => {
     const totals = { totalCalories: 0, totalProtein: 0 }
 
@@ -150,43 +154,56 @@ function TargetsSection({ ref }) {
     const targetCalories = userComputedStats?.calorieGoal || 1
     const targetProtein = userComputedStats?.proteinTarget || 1
 
+    // totals.totalCalories = 3000
+    // totals.totalProtein = 3000
+
+    const rawCaloriesPercent = (totals.totalCalories / targetCalories) * 100
+    const rawProteinPercent = (totals.totalProtein / targetProtein) * 100
+
     devLog('running totalCalories soFar', totals.totalCalories)
     devLog('targetProtein', targetProtein)
 
     return {
       totalCalories: totals.totalCalories,
       totalProtein: totals.totalProtein,
-      totalCaloriesPercent: Math.min((totals.totalCalories / targetCalories) * 100, 100),
-      totalProteinPercent: Math.min((totals.totalProtein / targetProtein) * 100, 100),
+      totalCaloriesPercent: Math.min(rawCaloriesPercent, 100),
+      totalProteinPercent: Math.min(rawProteinPercent, 100),
       remainingCalories: Math.max(targetCalories - totals.totalCalories, 0),
       remainingProtein: Math.max(targetProtein - totals.totalProtein, 0),
+      isOverCaloriesTarget: rawCaloriesPercent > 100,
+      isOverProteinTarget: rawProteinPercent > 100,
+      overCalories: Math.max(totals.totalCalories - targetCalories, 0),
+      overProtein: Math.max(totals.totalProtein - targetProtein, 0),
     }
   }, [mealsById, userComputedStats])
 
   devLog('totalCaloriesPercent', totalCaloriesPercent)
   devLog('remainingCalories', remainingCalories)
+  devLog('overCalories', overCalories)
 
   return (
     <div>
       <AccountSetupNotice />
       <div ref={ref} className="flex justify-center gap-4 p-4">
         <CircularProgress
-          color={'primary'}
-          value={totalCalories}
+          color={isOverCaloriesTarget && userComputedStats ? 'destructive' : 'primary'}
+          totalValue={totalCalories}
           icon={Hamburger}
-          hasUserComputedStats={!userComputedStats}
-          secondValue={remainingCalories}
+          overValue={overCalories}
+          hasUserComputedStats={!!userComputedStats}
+          remainingValue={remainingCalories}
           label={'Calories consumed:'}
           unit={'kcal'}
           percent={totalCaloriesPercent}
         />
 
         <CircularProgress
-          color={'secondary'}
-          hasUserComputedStats={!userComputedStats}
-          value={totalProtein}
+          color={isOverProteinTarget && userComputedStats ? 'destructive' : 'secondary'}
+          hasUserComputedStats={!!userComputedStats}
+          totalValue={totalProtein}
           icon={BicepsFlexed}
-          secondValue={remainingProtein}
+          overValue={overProtein}
+          remainingValue={remainingProtein}
           label={'Protein consumed:'}
           unit={'grams'}
           percent={totalProteinPercent}

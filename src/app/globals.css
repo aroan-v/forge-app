@@ -31,7 +31,7 @@
   --color-success-content: oklch(27% 0.046 192.524);
   --color-warning: oklch(90% 0.182 98.111);
   --color-warning-content: oklch(42% 0.095 57.708);
-  --color-error: oklch(64% 0.246 16.439);
+  --color-error: oklch(66.152% 0.23082 12.384);
   --color-error-content: oklch(96% 0.015 12.422);
   --radius-selector: 1rem;
   --radius-field: 0.5rem;
@@ -99,7 +99,7 @@
   --color-success-content: oklch(27% 0.046 192.524);
   --color-warning: oklch(90% 0.182 98.111);
   --color-warning-content: oklch(42% 0.095 57.708);
-  --color-error: oklch(64% 0.246 16.439);
+  --color-error: oklch(66.152% 0.23082 12.384);
   --color-error-content: oklch(96% 0.015 12.422);
 
   /* Radius, size, depth */

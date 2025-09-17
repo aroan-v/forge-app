@@ -1,3 +1,4 @@
+import { devLog } from '@/lib/logger'
 import { cn } from '@/lib/utils'
 import React from 'react'
 import { buildStyles, CircularProgressbarWithChildren } from 'react-circular-progressbar'
@@ -24,23 +25,34 @@ const colorVariants = {
 }
 
 function CircularProgress({
+  totalValue, // totalCalories
+  target, // calorieGoal
   percent,
-  hasUserComputedStats,
+  overValue, // how much over
+  remainingValue, // how much left
+  isOverTarget, // boolean
   color,
-  value = 0,
-  secondValue,
   icon: Icon,
+  hasUserComputedStats,
   label,
   unit,
 }) {
   const [progress, setProgress] = React.useState(0)
   const variant = colorVariants[color] || colorVariants.default
 
+  devLog('totalValue', totalValue)
+  devLog('remainingValue', remainingValue)
+  devLog('hasUserComputedStats', hasUserComputedStats)
+  devLog('color', color)
+  devLog('variant', variant)
+  devLog('percent', percent)
+  devLog('progress', progress)
+
   React.useEffect(() => {
     // Animate from 0 → target value
     const animation = setTimeout(() => setProgress(percent), 500)
     return () => clearTimeout(animation)
-  }, [value, percent])
+  }, [totalValue, percent])
 
   return (
     <div
@@ -53,9 +65,7 @@ function CircularProgress({
       <CircularProgressbarWithChildren
         strokeWidth={5}
         styles={buildStyles({
-          pathColor: hasUserComputedStats
-            ? `rgba(var(--${color}-rgb), 0.2)` // 20% opacity
-            : `var(--${color})`,
+          pathColor: `var(--${color})`,
           trailColor: 'var(--color-base-200)',
         })}
         value={progress}
@@ -63,20 +73,19 @@ function CircularProgress({
         {Icon && <Icon size={32} />}
         {label && <div className="text-foreground/60 text-sm font-normal">{label}</div>}
 
-        {secondValue && !hasUserComputedStats ? (
-          <>
-            <div className="text-base font-bold">
-              <CountUp start={0} end={value} duration={2} /> {unit}
-            </div>
+        <div className="text-center text-base font-bold">
+          <CountUp start={0} end={totalValue} duration={2} /> {unit}
+        </div>
 
-            <div className="text-foreground/40 text-center text-sm font-medium">
-              -- <br />
-              <CountUp start={0} end={secondValue} duration={2} /> {unit} left
-            </div>
-          </>
-        ) : (
-          <div className="text-foreground text-base font-bold">
-            <CountUp start={0} end={value} duration={2} /> {unit}
+        {remainingValue > 0 && hasUserComputedStats && (
+          <div className="text-foreground/40 text-center text-xs font-medium">
+            <CountUp start={0} end={remainingValue} duration={2} /> {unit} left
+          </div>
+        )}
+
+        {overValue > 0 && hasUserComputedStats && (
+          <div className="text-foreground/40 text-center text-xs font-medium">
+            over by <CountUp start={0} end={overValue} duration={2} /> {unit}!
           </div>
         )}
       </CircularProgressbarWithChildren>
