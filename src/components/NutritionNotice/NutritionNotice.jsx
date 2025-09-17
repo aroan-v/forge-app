@@ -3,7 +3,7 @@ import { Info } from 'lucide-react'
 
 export function NutritionNotice() {
   return (
-    <Alert className="w-full max-w-xl">
+    <Alert className="max-w-xl">
       <Info className="h-8 w-8" />
       <AlertTitle className="font-semibold">Important Notice</AlertTitle>
       <AlertDescription>

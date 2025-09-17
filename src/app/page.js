@@ -45,7 +45,7 @@ export default function Home() {
 
       <TargetsSection ref={scrollIntoTargetsRef} />
       <NutritionNotice />
-      <div className="space-y-6">
+      <div className="w-full max-w-xl space-y-6">
         {foodGroups.map((id) => (
           <MealTable key={id} groupId={id} />
         ))}
@@ -169,7 +169,7 @@ function TargetsSection({ ref }) {
   return (
     <div>
       <AccountSetupNotice />
-      <div ref={ref} className="flex w-md justify-center gap-4 p-4">
+      <div ref={ref} className="flex justify-center gap-4 p-4">
         <CircularProgress
           color={'primary'}
           value={totalCalories}

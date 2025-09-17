@@ -22,7 +22,7 @@ function MotionTable({ className, ...props }) {
       layout="size"
       data-slot="table-container"
       transition={{ duration: 0.25 }}
-      className="relative w-full overflow-x-auto"
+      className="relative overflow-x-auto"
     >
       <table
         data-slot="table"

@@ -19,7 +19,7 @@ function AccountSetupNotice() {
   }
 
   return (
-    <Alert variant="accent" className="w-full max-w-xl">
+    <Alert variant="accent" className="max-w-xl">
       <Info className="h-4 w-4" />
       <div>
         <AlertTitle>{"Looks like you're new here!"}</AlertTitle>

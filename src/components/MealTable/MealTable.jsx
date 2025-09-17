@@ -87,7 +87,7 @@ function MealTable({ groupId }) {
       animate={{ height: 'auto' }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
       layout
-      className="bg-base-200 relative w-full max-w-xl overflow-scroll rounded-md p-4"
+      className="bg-base-200 relative overflow-scroll rounded-md p-4"
     >
       <motion.div layout className="absolute top-6 right-2 -translate-y-1/2">
         <SettingsAction groupId={groupId} onEdit={() => setIsEditingHeader(true)} />
@@ -164,7 +164,7 @@ function MealTable({ groupId }) {
 function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
   devLog('TableStructure rendered')
   return (
-    <MotionTable className="w-full table-fixed">
+    <MotionTable className="table-fixed">
       <MotionTableHeader>
         <MotionTableRow>
           {deleteMode && (
@@ -216,7 +216,7 @@ function GroupHeader({ initialVal, setIsEditingHeader, isEditingHeader, handleSa
   }, [isEditingHeader])
 
   return (
-    <motion.div layout="size" className="mb-2 flex w-[95%] gap-4 p-2 align-middle">
+    <motion.div layout="size" className="mb-2 flex w-[95%] gap-4 align-middle">
       <Input
         value={localGroupName ?? ''}
         placeholder="Food Group"
