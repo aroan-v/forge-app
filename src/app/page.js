@@ -14,6 +14,7 @@ import { ConfirmDialogWithTrigger } from '@/components/ConfirmDialog'
 import AccountSetupNotice from '@/components/AccountSetupNotice'
 import Hero from '@/components/Hero'
 import Link from 'next/link'
+import Spinner from '@/components/Spinner'
 
 export default function Home() {
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
@@ -41,6 +42,7 @@ export default function Home() {
           </Link>
         </p>
       </Hero>
+
       <TargetsSection ref={scrollIntoTargetsRef} />
       <NutritionNotice />
       <div className="space-y-6">
@@ -162,6 +164,7 @@ function TargetsSection({ ref }) {
   }, [mealsById, userComputedStats])
 
   devLog('totalCaloriesPercent', totalCaloriesPercent)
+  devLog('remainingCalories', remainingCalories)
 
   return (
     <div>
@@ -171,7 +174,7 @@ function TargetsSection({ ref }) {
           color={'primary'}
           value={totalCalories}
           icon={Hamburger}
-          isNull={userComputedStats == null}
+          hasUserComputedStats={!userComputedStats}
           secondValue={remainingCalories}
           label={'Calories consumed:'}
           unit={'kcal'}
@@ -180,7 +183,7 @@ function TargetsSection({ ref }) {
 
         <CircularProgress
           color={'secondary'}
-          isNull={userComputedStats == null}
+          hasUserComputedStats={!userComputedStats}
           value={totalProtein}
           icon={BicepsFlexed}
           secondValue={remainingProtein}

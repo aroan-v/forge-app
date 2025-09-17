@@ -11,16 +11,14 @@ function ClientProvider({ children }) {
   const resetSignal = useFoodStoreVersionTwo((s) => s.resetSignal)
   const resetStatsSignal = useStatsStore((s) => s.resetSignal)
 
-  // Checks if the local storage already has saved userStats
+  // Effect 1: restore user stats
+  // Effect 2: restore groups & meals
   React.useEffect(() => {
     const userStatsString = localStorage.getItem('userStats')
-
-    devLog('userStatsString', userStatsString)
 
     if (userStatsString) {
       try {
         const parsedUserStats = JSON.parse(userStatsString)
-
         if (Object.keys(parsedUserStats).length > 0) {
           setShallowState({ userComputedStats: parsedUserStats })
         }
@@ -29,11 +27,27 @@ function ClientProvider({ children }) {
       }
     }
 
-    const groupsById = JSON.parse(localStorage.getItem('groupsById'))
-    const mealsById = JSON.parse(localStorage.getItem('mealsById'))
+    const groupsByIdString = localStorage.getItem('groupsById')
+    const mealsByIdString = localStorage.getItem('mealsById')
 
-    devLog('groupsById', groupsById)
-    devLog('mealsById', mealsById)
+    let groupsById = null
+    let mealsById = null
+
+    if (groupsByIdString) {
+      try {
+        groupsById = JSON.parse(groupsByIdString)
+      } catch (error) {
+        console.error('Failed to parse groupsById from localStorage:', error)
+      }
+    }
+
+    if (mealsByIdString) {
+      try {
+        mealsById = JSON.parse(mealsByIdString)
+      } catch (error) {
+        console.error('Failed to parse mealsById from localStorage:', error)
+      }
+    }
 
     if (
       groupsById &&
@@ -43,21 +57,20 @@ function ClientProvider({ children }) {
     ) {
       hydrate({ groupsById, mealsById })
     } else {
-      devLog('keys not found - initializing')
       addFoodGroup()
     }
 
-    setShallowState({
-      isLoading: false,
-    })
-  }, [setShallowState, addFoodGroup, hydrate])
+    setShallowState({ isLoading: false })
+  }, [hydrate, addFoodGroup, setShallowState])
 
+  // Effect 3: reset user stats in local storage
   React.useEffect(() => {
     if (resetStatsSignal > 0) {
       localStorage.setItem('userStats', JSON.stringify({}))
     }
   }, [resetStatsSignal])
 
+  // Effect 3: reset meal stats in local storage
   React.useEffect(() => {
     if (resetSignal > 0) {
       localStorage.setItem('mealsById', JSON.stringify({}))

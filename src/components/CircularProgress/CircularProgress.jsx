@@ -25,7 +25,7 @@ const colorVariants = {
 
 function CircularProgress({
   percent,
-  isNull,
+  hasUserComputedStats,
   color,
   value = 0,
   secondValue,
@@ -53,7 +53,7 @@ function CircularProgress({
       <CircularProgressbarWithChildren
         strokeWidth={5}
         styles={buildStyles({
-          pathColor: isNull
+          pathColor: hasUserComputedStats
             ? `rgba(var(--${color}-rgb), 0.2)` // 20% opacity
             : `var(--${color})`,
           trailColor: 'var(--color-base-200)',
@@ -63,7 +63,7 @@ function CircularProgress({
         {Icon && <Icon size={32} />}
         {label && <div className="text-foreground/60 text-sm font-normal">{label}</div>}
 
-        {secondValue ? (
+        {secondValue && !hasUserComputedStats ? (
           <>
             <div className="text-base font-bold">
               <CountUp start={0} end={value} duration={2} /> {unit}

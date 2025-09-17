@@ -8,6 +8,11 @@ import Link from 'next/link'
 
 function AccountSetupNotice() {
   const userComputedStats = useStatsStore((s) => s.userComputedStats)
+  const isLoading = useStatsStore((s) => s.isLoading)
+
+  if (isLoading) {
+    return
+  }
 
   if (userComputedStats) {
     return
@@ -17,9 +22,9 @@ function AccountSetupNotice() {
     <Alert variant="accent" className="w-full max-w-xl">
       <Info className="h-4 w-4" />
       <div>
-        <AlertTitle>Looks like you're new here!</AlertTitle>
+        <AlertTitle>{"Looks like you're new here!"}</AlertTitle>
         <AlertDescription>
-          Let's get you set up with your daily calorie and protein goals.
+          {"Let's get you set up with your daily calorie and protein goals."}
           <Link href="/setup">
             <Button size="sm" variant="accent">
               Set up now

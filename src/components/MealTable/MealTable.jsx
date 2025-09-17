@@ -236,7 +236,7 @@ function GroupHeader({ initialVal, setIsEditingHeader, isEditingHeader, handleSa
             exit={{ opacity: 0, y: -8, scale: 0.95 }}
             transition={motionTransition}
             variant="defaultOutline"
-            size="stretch"
+            size="fill"
             onClick={() => handleSave(localGroupName)}
           >
             Save
