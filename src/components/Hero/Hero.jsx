@@ -1,8 +1,8 @@
 import React from 'react'
 
-function Hero({ color, title, description, children, isBig }) {
+function Hero({ targetRef, color, title, description, children, isBig }) {
   return (
-    <div className="ds-hero">
+    <div className="ds-hero" ref={targetRef}>
       <div className="ds-hero-content flex flex-col text-center">
         <div className="max-w-md">
           <h1

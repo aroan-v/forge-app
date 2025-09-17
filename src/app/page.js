@@ -38,7 +38,7 @@ export default function Home() {
         <StartFreshSection />
         <p className="text-muted-foreground hover:text-accent text-xs">
           <Link href="/setup" className="hover:underline">
-            Edit profile
+            Go to profile
           </Link>
         </p>
       </Hero>
@@ -184,7 +184,7 @@ function TargetsSection({ ref }) {
   return (
     <div>
       <AccountSetupNotice />
-      <div ref={ref} className="flex justify-center gap-4 p-4">
+      <div ref={ref} className="flex max-w-lg justify-center gap-4 p-4">
         <CircularProgress
           color={isOverCaloriesTarget && userComputedStats ? 'destructive' : 'primary'}
           totalValue={totalCalories}

@@ -96,7 +96,7 @@ export default function UserStats({ stats }) {
 
   return (
     <DaisyThemeWrapper className="flex flex-col items-center gap-4">
-      <div className="flex w-md justify-center gap-4 p-4">
+      <div className="flex max-w-lg justify-center gap-4 p-4">
         <CircularProgress
           color={'primary'}
           totalValue={stats.calorieGoal}

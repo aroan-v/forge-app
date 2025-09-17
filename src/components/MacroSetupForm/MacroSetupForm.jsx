@@ -16,15 +16,15 @@ import { generateUserStats } from '@/lib/nutritionUtils'
 import UserStats from '../UserStats'
 import { devLog } from '@/lib/logger'
 
-export default function MacroSetupForm({}) {
+export default function MacroSetupForm({ scrollToTargetRef }) {
   // Local form states
   const [name, setName] = useState('')
-  const [age, setAge] = useState('28')
-  const [height, setHeight] = useState('163')
-  const [weight, setWeight] = useState('70')
-  const [gender, setGender] = useState('male')
-  const [activityLevel, setActivityLevel] = useState('moderate')
-  const [goal, setGoal] = useState('bulking')
+  const [age, setAge] = useState('')
+  const [height, setHeight] = useState('')
+  const [weight, setWeight] = useState('')
+  const [gender, setGender] = useState('')
+  const [activityLevel, setActivityLevel] = useState('')
+  const [goal, setGoal] = useState('')
 
   const setUserData = useStatsStore((state) => state.setUserData)
   const setTargets = useStatsStore((state) => state.setTargets)
@@ -65,6 +65,12 @@ export default function MacroSetupForm({}) {
 
     localStorage.setItem('userStats', JSON.stringify(processedStats))
 
+    // Scroll into the charts
+    if (scrollToTargetRef.current) {
+      devLog('scrollToTargetRef activated')
+      scrollToTargetRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
     return
 
     try {
@@ -100,9 +106,9 @@ export default function MacroSetupForm({}) {
   }
 
   return (
-    <DaisyThemeWrapper className="pb-20">
+    <DaisyThemeWrapper className="w-full">
       <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
-        <fieldset className="ds-fieldset bg-base-200 border-base-300 rounded-box w-xs space-y-2 border p-4">
+        <fieldset className="ds-fieldset bg-base-200 border-base-300 rounded-box space-y-2 border p-4">
           <label htmlFor="name" className="ds-label text-sm">
             Name (Optional)
           </label>

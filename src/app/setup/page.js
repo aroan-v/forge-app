@@ -8,12 +8,15 @@ import { devLog } from '@/lib/logger'
 import UserStats from '@/components/UserStats'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { ConfirmDialogWithTrigger } from '@/components/ConfirmDialog'
-import { useFoodStoreVersionTwo } from '../store/useFoodStore'
+import React from 'react'
 
 const content = {
   initial: {
-    title: 'Your Personalized Nutrition Starts Here',
+    title: (
+      <>
+        Your Personalized Nutrition <br /> Starts Here
+      </>
+    ),
     description:
       'Tell us a bit about yourself—your height, weight, age, and activity level—and we’ll calculate the perfect protein and calorie targets to fuel your day.',
   },
@@ -26,6 +29,7 @@ const content = {
 export default function SetupPage() {
   const isLoading = useStatsStore((s) => s.isLoading)
   const userComputedStats = useStatsStore((state) => state.userComputedStats)
+  const scrollToTargetRef = React.useRef(null)
 
   const title = userComputedStats
     ? content.results.title(userComputedStats.name)
@@ -43,12 +47,20 @@ export default function SetupPage() {
     )
   }
 
+  devLog('scrollToTargetRef', scrollToTargetRef)
+
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
-      <Hero title={title} color="secondary" isBig={!!userComputedStats} description={description}>
+      <Hero
+        targetRef={scrollToTargetRef}
+        title={title}
+        color="secondary"
+        isBig={!!userComputedStats}
+        description={description}
+      >
         <Link href="/">
           {userComputedStats ? (
-            <Button size="lg" variant="gradient" className="animate-emphasize-scale">
+            <Button size="lg" variant="gradient">
               Start tracking!
             </Button>
           ) : (
@@ -60,7 +72,11 @@ export default function SetupPage() {
       </Hero>
       {/* {!isLoading && <MacroSetupForm userComputedStats={userComputedStats} />} */}
 
-      {userComputedStats ? <UserStats stats={userComputedStats} /> : <MacroSetupForm />}
+      {userComputedStats ? (
+        <UserStats stats={userComputedStats} />
+      ) : (
+        <MacroSetupForm scrollToTargetRef={scrollToTargetRef} />
+      )}
     </DaisyThemeWrapper>
   )
 }

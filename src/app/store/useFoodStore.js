@@ -271,7 +271,7 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
   foodGroups: ['breakfast_silog232'],
   groupsById: {
     breakfast_silog232: {
-      name: 'Breakfast',
+      name: 'Breakfast (Sample)',
       mealIds: ['sinangag2023', 'itlog2023', 'longganisa_123', 'ensalada2023'],
       totalProtein: null,
       totalCalories: null,
@@ -279,7 +279,7 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
   },
   mealsById: {
     sinangag2023: {
-      food: 'Garlic Fried Rice (Sinangag)',
+      food: 'Garlic Fried Rice',
       value: 200,
       unit: 'g',
       displayValue: '200 g',

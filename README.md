@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Macro Calculator with AI
 
-## Getting Started
+## Main Features
 
-First, run the development server:
+- Macro Tracking: Enter meals with flexible units (e.g., grams, pcs, gallons). Defaults to grams for precision.
+- AI-Powered Food Analysis: Submits food entries to AI (Groq + Gemma) to compute calories and protein while ignoring non-food items.
+- Local Storage Persistence: Saves user stats and meal entries with computed values for easy recall.
+- Health Metrics Calculator:
+  - BMI (Body Mass Index): Weight relative to height.
+  - BMR (Basal Metabolic Rate): Calories burned at rest.
+  - TDEE (Total Daily Energy Expenditure): Daily calories burned including activity.
+  - Water Intake Recommendation: Based on user stats.
+- Progress Tracking: Compares consumed macros against calculated calories and protein targets.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Limitations
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- AI Dependence: Food recognition relies on AI accuracy — occasional misclassifications possible.
+- No Offline AI: Requires an internet connection for AI-powered calculations.
+- Local Only: Data is stored in browser localStorage, so progress is device-specific.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Other Explored Concepts Through Research
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Next.js API Routes for integrating external AI models.
+- State Management with Zustand for global store handling.
+- UI/UX Theming with TailwindCSS and DaisyUI.
+- Component Libraries: ShadCN for interactive and accessible UI elements.
+- AI Integration with Groq SDK and Gemma model for structured chat + nutrition analysis.
+- Developer Tooling: Custom dev logging with `@/lib/logger`.
 
-## Learn More
+## Applications Used
 
-To learn more about Next.js, take a look at the following resources:
+- Visual Studio Code – development
+- Figma – design elements and prototyping
+- Git & GitHub – version control
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+aroan-v
