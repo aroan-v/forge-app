@@ -7,31 +7,53 @@ import React, { use } from 'react'
 import { useFoodStoreVersionTwo } from './store/useFoodStore'
 import { NutritionNotice } from '@/components/NutritionNotice'
 import CircularProgress from '@/components/CircularProgress'
-import { BicepsFlexed, Hamburger } from 'lucide-react'
+import { BicepsFlexed, Hamburger, SquarePlus } from 'lucide-react'
 import { useStatsStore } from './store/useStatsStore'
 import { devLog } from '@/lib/logger'
 import { ConfirmDialogWithTrigger } from '@/components/ConfirmDialog'
 import AccountSetupNotice from '@/components/AccountSetupNotice'
+import Hero from '@/components/Hero'
+import Link from 'next/link'
 
 export default function Home() {
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
   const foodGroups = useFoodStoreVersionTwo((s) => s.foodGroups)
+  const scrollIntoTargetsRef = React.useRef(null)
 
   devLog('foodGroups', foodGroups)
 
+  const title = 'Track what you ate today!'
+  const description = (
+    <>
+      Type in the food you ate and the amount for each. We use the
+      <span className="text-primary font-medium"> Gemma-2 model </span> — a powerful AI from Google
+      DeepMind — running on Groq&apos;s LPU hardware to instantly calculate the calories and protein
+      for your meal.
+    </>
+  )
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
-      <Hero />
-      <TargetsSection />
+      <Hero title={title} description={description}>
+        <StartFreshSection />
+        <p className="text-muted-foreground hover:text-accent text-xs">
+          <Link href="/setup" className="hover:underline">
+            Edit profile
+          </Link>
+        </p>
+      </Hero>
+      <TargetsSection ref={scrollIntoTargetsRef} />
       <NutritionNotice />
-      {foodGroups.map((id) => (
-        <MealTable key={id} groupId={id} />
-      ))}
+      <div className="space-y-6">
+        {foodGroups.map((id) => (
+          <MealTable key={id} groupId={id} />
+        ))}
 
-      <Button variant="default" onClick={addFoodGroup}>
-        + Add New Group
-      </Button>
-      <CalculateNutrition />
+        <Button size="stretch" variant="defaultOutline" onClick={addFoodGroup}>
+          <SquarePlus />
+          Add Food Group
+        </Button>
+      </div>
+      <CalculateNutrition ref={scrollIntoTargetsRef} />
     </DaisyThemeWrapper>
   )
 }
@@ -102,24 +124,7 @@ function MealSection() {
   )
 }
 
-function Hero() {
-  return (
-    <div className="ds-hero">
-      <div className="ds-hero-content flex flex-col text-center">
-        <div className="max-w-md">
-          <h1 className="text-primary text-xl font-bold">{'Track what you ate today!'}</h1>
-          <p className="py-3">
-            Simply type in the food you ate and the amount for each. Our AI will instantly calculate
-            the calories and protein, so you can see how each meal contributes to your daily goals.
-          </p>
-        </div>
-        <StartFreshSection />
-      </div>
-    </div>
-  )
-}
-
-function TargetsSection({}) {
+function TargetsSection({ ref }) {
   const userComputedStats = useStatsStore((s) => s.userComputedStats)
   const mealsById = useFoodStoreVersionTwo((s) => s.mealsById)
 
@@ -161,7 +166,7 @@ function TargetsSection({}) {
   return (
     <div>
       <AccountSetupNotice />
-      <div className="flex w-md justify-center gap-4 p-4">
+      <div ref={ref} className="flex w-md justify-center gap-4 p-4">
         <CircularProgress
           color={'primary'}
           value={totalCalories}

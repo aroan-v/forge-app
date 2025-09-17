@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@tailwind utilities;
+
 @import 'tw-animate-css';
 @plugin "daisyui" {
   themes: [ 'synthwave-custom']; /* or false if you’ll define custom ones */
@@ -283,4 +285,22 @@
   background-color: var(--color-base-200);
   color: color-mix(in oklab, var(--color-base-content) 40%, transparent);
   box-shadow: none;
+}
+
+@layer utilities {
+  @keyframes emphasize-scale {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05); /* Slightly bigger */
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-emphasize-scale {
+    animation: emphasize-scale 0.3s ease-out 1;
+  }
 }

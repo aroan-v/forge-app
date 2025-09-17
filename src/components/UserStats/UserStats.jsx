@@ -8,6 +8,9 @@ import { CircularProgressbarWithChildren, buildStyles } from 'react-circular-pro
 
 import CircularProgress from '../CircularProgress'
 import { cn } from '@/lib/utils'
+import { ConfirmDialogWithTrigger } from '../ConfirmDialog'
+import { useStatsStore } from '@/app/store/useStatsStore'
+import { Button } from '../ui/button'
 
 export default function UserStats({ stats }) {
   const [progress, setProgress] = React.useState(0)
@@ -92,7 +95,7 @@ export default function UserStats({ stats }) {
   ]
 
   return (
-    <DaisyThemeWrapper className="flex flex-col items-center">
+    <DaisyThemeWrapper className="flex flex-col items-center gap-4">
       <div className="flex w-md justify-center gap-4 p-4">
         <CircularProgress
           color={'primary'}
@@ -112,8 +115,6 @@ export default function UserStats({ stats }) {
       </div>
 
       <div className="grid grid-rows-[auto_auto] items-start justify-center gap-4">
-        {/* First row */}
-
         <Card className="row-start-1 row-end-2 flex w-full items-center justify-center gap-4">
           <PersonStanding size={32} className={`${bodyMassIndex.color}`} />
           <div className="flex flex-col items-center justify-center gap-2">
@@ -138,7 +139,6 @@ export default function UserStats({ stats }) {
           </div>
         </Card>
 
-        {/* Second row */}
         <div className="row-start-2 row-end-3 flex w-full flex-wrap justify-center gap-4">
           {bodyCompositionItems?.map(({ name, label, value, unit, content }) => (
             <Card
@@ -155,6 +155,8 @@ export default function UserStats({ stats }) {
           ))}
         </div>
       </div>
+
+      <ResetUserStats />
     </DaisyThemeWrapper>
   )
 }
@@ -173,5 +175,20 @@ function Stat({ name, rating, color, content, unit, children }) {
       {/* Optional unit */}
       {/* {unit && <p className="text-sm font-semibold text-gray-800">{unit}</p>} */}
     </div>
+  )
+}
+
+function ResetUserStats() {
+  const resetUserStats = useStatsStore((s) => s.resetUserStats)
+
+  return (
+    <ConfirmDialogWithTrigger
+      title="Reset Saved Stats?"
+      dialogDescription="This will erase all your saved stats."
+      confirmationContent="Yes, reset"
+      handleConfirmation={resetUserStats}
+    >
+      <Button variant="destructiveOutline">Reset Profile</Button>
+    </ConfirmDialogWithTrigger>
   )
 }

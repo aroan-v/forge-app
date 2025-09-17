@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { devLog } from '@/lib/logger'
 import { Card } from '../ui/card'
 
-function CalculateNutrition() {
+function CalculateNutrition({ ref }) {
   const [content, setContent] = React.useState('') // holds any messages to show in UI
   const [isLoading, setIsLoading] = React.useState(false) // tracks loading state
   const [localUnregisteredFood, setLocalUnregisteredFood] = React.useState({})
@@ -23,6 +23,18 @@ function CalculateNutrition() {
   const updateLoggedFoodWithNutrition = useFoodStoreVersionTwo(
     (s) => s.updateLoggedFoodWithNutrition
   )
+
+  // Auto clear content
+  React.useEffect(() => {
+    let timer
+    if (content) {
+      timer = setTimeout(() => {
+        setContent('')
+        setButtonDisabled(false)
+      }, 3000)
+    }
+    return () => clearTimeout(timer)
+  }, [content])
 
   devLog('localUnregisteredFood', localUnregisteredFood)
   devLog('badNutritionResponses', badNutritionResponses)
@@ -47,57 +59,6 @@ function CalculateNutrition() {
       }
 
       const data = await res.json()
-      // let parsedContent = {
-      //   // ✅ Good ones
-      //   sinangag2023: {
-      //     food: 'Garlic Fried Rice (Sinangag)',
-      //     displayValue: '200 g',
-      //     calories: 340,
-      //     protein: 6.4,
-      //   },
-      //   itlog2023: {
-      //     food: 'Fried Egg',
-      //     displayValue: '2 pcs',
-      //     calories: 184,
-      //     protein: 12.4,
-      //   },
-      //   longganisa_123: {
-      //     food: 'Longganisa (Sweet Pork Sausage)',
-      //     displayValue: '3 pcs',
-      //     calories: 285,
-      //     protein: 15.3,
-      //   },
-      //   ensalada2023: {
-      //     food: 'Tomato & Cucumber Side Salad',
-      //     displayValue: '100 g',
-      //     calories: 18,
-      //     protein: 0.9,
-      //   },
-
-      //   // ❌ Bad Case 1: Unknown ID
-      //   mysteryDish999: {
-      //     food: 'AI Glitched Dish',
-      //     displayValue: '1 serving',
-      //     calories: 420,
-      //     protein: 9,
-      //   },
-      //   // ❌ Bad Case 2: Known ID but invalid nutrition
-      //   itlog2023_clone: {
-      //     food: 'Weird Duplicate Egg',
-      //     displayValue: '2 pcs',
-      //     calories: null,
-      //     protein: null,
-      //   },
-
-      //   // ❌ Bad Case 3: Known ID but only one valid field (edge case)
-      //   sinangag2023_fake: {
-      //     food: 'Rice with Missing Protein',
-      //     displayValue: '150 g',
-      //     calories: 200,
-      //     protein: null,
-      //   },
-      // }
-
       devLog('dataReceived', data)
 
       if (data) {
@@ -108,12 +69,19 @@ function CalculateNutrition() {
       } else {
         setContent('⚠️ Failed to parse nutrition data')
       }
+
+      setTimeout(() => setContent(''), 3000)
     } catch (err) {
       console.error(err)
       setButtonDisabled(true)
       setContent('❌ Error fetching nutrition data')
     } finally {
       setIsLoading(false)
+
+      // Scroll into the charts
+      if (ref.current) {
+        ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
     }
   }
 
@@ -125,6 +93,8 @@ function CalculateNutrition() {
 
     const unregisteredFoodArray = Object.values(currentUnregisteredFood).map(({ food }) => food)
 
+    devLog('unregisteredFoodArray', unregisteredFoodArray)
+
     if (unregisteredFoodArray.length > 0) {
       setLocalUnregisteredFood(unregisteredFoodArray)
       setContent(`Getting data for ${unregisteredFoodArray.join(', ')}`)
@@ -134,13 +104,6 @@ function CalculateNutrition() {
 
   return (
     <div className="space-y-4 text-center">
-      {/* {) === 0 && (
-        <span className="text-muted-foreground block text-xs font-medium">
-          Add valid entries before AI can calculate what you ate!
-        </span>
-        
-      )} */}
-
       {isLoading && <p className="text-muted-foreground text-sm">{content}</p>}
 
       {!isLoading && content && (

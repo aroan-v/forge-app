@@ -1,3 +1,4 @@
+import { devLog } from '@/lib/logger'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 
@@ -6,6 +7,8 @@ export const useStatsStore = create(
     userData: {},
     userComputedStats: null,
     isLoading: true,
+
+    resetSignal: 0,
 
     targetNutrients: {
       targetCalories: null,
@@ -23,10 +26,21 @@ export const useStatsStore = create(
       }),
 
     setShallowState: (newData) =>
-      set((state) => ({
-        ...state,
-        ...newData,
-      })),
+      set((state) => {
+        devLog('setShallowState invoked')
+
+        return {
+          ...state,
+          ...newData,
+        }
+      }),
+
+    resetUserStats: () => {
+      set({
+        userComputedStats: null,
+        resetSignal: get().resetSignal + 1,
+      })
+    },
 
     setTargets: ({ targetCalories, targetProtein }) =>
       set((state) => {

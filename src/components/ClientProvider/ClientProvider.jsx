@@ -9,14 +9,24 @@ function ClientProvider({ children }) {
   const hydrate = useFoodStoreVersionTwo((s) => s.hydrate)
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
   const resetSignal = useFoodStoreVersionTwo((s) => s.resetSignal)
+  const resetStatsSignal = useStatsStore((s) => s.resetSignal)
 
+  // Checks if the local storage already has saved userStats
   React.useEffect(() => {
-    const savedPersonalStats = localStorage.getItem('userStats')
+    const userStatsString = localStorage.getItem('userStats')
 
-    devLog('savedStats', savedPersonalStats)
+    devLog('userStatsString', userStatsString)
 
-    if (savedPersonalStats) {
-      setShallowState({ userComputedStats: JSON.parse(savedPersonalStats) })
+    if (userStatsString) {
+      try {
+        const parsedUserStats = JSON.parse(userStatsString)
+
+        if (Object.keys(parsedUserStats).length > 0) {
+          setShallowState({ userComputedStats: parsedUserStats })
+        }
+      } catch (error) {
+        console.error('Failed to parse userStats from localStorage:', error)
+      }
     }
 
     const groupsById = JSON.parse(localStorage.getItem('groupsById'))
@@ -41,6 +51,12 @@ function ClientProvider({ children }) {
       isLoading: false,
     })
   }, [setShallowState, addFoodGroup, hydrate])
+
+  React.useEffect(() => {
+    if (resetStatsSignal > 0) {
+      localStorage.setItem('userStats', JSON.stringify({}))
+    }
+  }, [resetStatsSignal])
 
   React.useEffect(() => {
     if (resetSignal > 0) {

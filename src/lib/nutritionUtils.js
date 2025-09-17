@@ -51,7 +51,7 @@ export function calculateHydration(weight) {
 }
 
 export function generateUserStats(userData) {
-  const { weight, height, age, gender, goal, activityLevel } = userData
+  const { name, weight, height, age, gender, goal, activityLevel } = userData
 
   const bmr = calculateBMR({ weight, height, age, gender })
   const tdee = calculateTDEE(bmr, activityLevel)
@@ -63,6 +63,7 @@ export function generateUserStats(userData) {
   const hydration = calculateHydration(weight)
 
   return {
+    name: name || 'Guest',
     bmr,
     tdee,
     calorieGoal,

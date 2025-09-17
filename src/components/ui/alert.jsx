@@ -9,7 +9,7 @@ const alertVariants = cva(
     'w-full rounded-lg px-4 py-3 text-sm ' + // sizing & spacing
     'has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] ' + // grid columns
     'gap-y-2 has-[>svg]:gap-x-3 ' + // gaps
-    '[&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current', // svg styling
+    '[&>svg]:size-6 [&>svg]:translate-y-0.5 [&>svg]:text-accent', // svg styling
 
   {
     variants: {
