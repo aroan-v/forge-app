@@ -152,11 +152,11 @@ export default function MacroSetupForm({ scrollToTargetRef }) {
             max={300}
           />
 
-          <label htmlFor="genderInput" className="ds-label">
+          <label id="gender-label" className="ds-label">
             Gender
           </label>
-          <Select className="w-full" onValueChange={setGender}>
-            <SelectTrigger id="genderInput">
+          <Select onValueChange={setGender} aria-labelledby="gender-label" name="gender">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
             <SelectContent>
@@ -168,11 +168,15 @@ export default function MacroSetupForm({ scrollToTargetRef }) {
             </SelectContent>
           </Select>
 
-          <label htmlFor="activityInput" className="ds-label">
+          <label id="activity-label" className="ds-label">
             Activity Level
           </label>
-          <Select onValueChange={setActivityLevel}>
-            <SelectTrigger id="activityInput">
+          <Select
+            onValueChange={setActivityLevel}
+            aria-labelledby="activity-label"
+            name="activityLevel"
+          >
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select activity level" />
             </SelectTrigger>
             <SelectContent>
@@ -186,11 +190,11 @@ export default function MacroSetupForm({ scrollToTargetRef }) {
             </SelectContent>
           </Select>
 
-          <label htmlFor="goalInput" className="ds-label">
+          <label id="goal-label" className="ds-label">
             Goal
           </label>
-          <Select onValueChange={setGoal}>
-            <SelectTrigger id="goalInput">
+          <Select onValueChange={setGoal} aria-labelledby="goal-label" name="goal">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select your goal" />
             </SelectTrigger>
             <SelectContent>

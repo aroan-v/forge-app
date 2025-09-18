@@ -38,6 +38,7 @@ export default function SetupPage() {
   const description = userComputedStats ? content.results.description : content.initial.description
 
   devLog('userComputedStats', userComputedStats)
+  devLog('isLoading', isLoading)
 
   if (isLoading) {
     return (

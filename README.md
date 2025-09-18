@@ -1,5 +1,13 @@
 # Macro Calculator with AI
 
+## Description
+
+Tracking meals can feel overwhelming, especially when standard macro trackers force you to pick from limited serving options or predefined ingredients. It’s easy to get lost in all the details and feel restricted by the app. That’s why I wanted to make it simpler and more accessible.
+
+With the power of AI—using Gemma (by Google and Gemini) and Groq as the API provider—you can now just type a detailed description of what you ate along with the serving size (which defaults to grams). The AI calculates calories and protein more accurately than traditional macro apps, handling the nuances of ingredients and portions for you.
+
+All you really need is your weighing scale and a record of what you ate. Input the details, and let AI do the math. Simple, fast, and precise.
+
 ## Main Features
 
 - Macro Tracking: Enter meals with flexible units (e.g., grams, pcs, gallons). Defaults to grams for precision.
