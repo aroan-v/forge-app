@@ -2,6 +2,7 @@
 import React from 'react'
 import { useStatsStore } from '@/app/store/useStatsStore'
 import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
+import { devLog } from '@/lib/logger'
 
 function ClientProvider({ children }) {
   const setShallowState = useStatsStore((s) => s.setShallowState)
@@ -10,11 +11,10 @@ function ClientProvider({ children }) {
   const resetSignal = useFoodStoreVersionTwo((s) => s.resetSignal)
   const resetStatsSignal = useStatsStore((s) => s.resetSignal)
 
-  // Effect 1: restore user stats
-  // Effect 2: restore groups & meals
   React.useEffect(() => {
-    const userStatsString = localStorage.getItem('userStats')
+    // Effect 1: restore user stats
 
+    const userStatsString = localStorage.getItem('userStats')
     if (userStatsString) {
       try {
         const parsedUserStats = JSON.parse(userStatsString)
@@ -26,6 +26,7 @@ function ClientProvider({ children }) {
       }
     }
 
+    // Effect 2: restore groups & meals
     const groupsByIdString = localStorage.getItem('groupsById')
     const mealsByIdString = localStorage.getItem('mealsById')
 
@@ -56,6 +57,7 @@ function ClientProvider({ children }) {
     ) {
       hydrate({ groupsById, mealsById })
     } else {
+      devLog('adding food group')
       addFoodGroup()
     }
 

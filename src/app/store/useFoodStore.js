@@ -4,44 +4,82 @@ import { nanoid } from 'nanoid'
 import { devError, devLog } from '@/lib/logger'
 import { produce } from 'immer'
 
-export const useFoodStore = create(
-  immer((set, get) => ({
-    loggedFood: [
+const loggedFood = [
+  {
+    name: 'Breakfast',
+    id: 'breakfast_silog232',
+    meals: [
       {
-        name: 'Breakfast',
-        id: 'breakfast_silog232',
-        meals: [
-          {
-            food: 'Garlic Fried Rice (Sinangag)',
-            value: 200, // grams
-            unit: 'g',
-            id: 'sinangag2023',
-            displayValue: '200 g',
-          },
-          {
-            food: 'Fried Egg',
-            value: 2, // 2 pcs
-            unit: 'pcs',
-            id: 'itlog2023',
-            displayValue: '2 pcs',
-          },
-          {
-            food: 'Longganisa (Sweet Pork Sausage)',
-            value: 3, // 3 pcs
-            unit: 'pcs',
-            displayValue: '3 pcs',
-          },
-          {
-            food: 'Tomato & Cucumber Side Salad',
-            value: 100, // grams
-            unit: 'g',
-            id: 'ensalada2023',
-            displayValue: '100 g',
-          },
-        ],
+        food: 'Garlic Fried Rice (Sinangag)',
+        value: 200, // grams
+        unit: 'g',
+        id: 'sinangag2023',
+        displayValue: '200 g',
+      },
+      {
+        food: 'Fried Egg',
+        value: 2, // 2 pcs
+        unit: 'pcs',
+        id: 'itlog2023',
+        displayValue: '2 pcs',
+      },
+      {
+        food: 'Longganisa (Sweet Pork Sausage)',
+        value: 3, // 3 pcs
+        unit: 'pcs',
+        displayValue: '3 pcs',
+      },
+      {
+        food: 'Tomato & Cucumber Side Salad',
+        value: 100, // grams
+        unit: 'g',
+        id: 'ensalada2023',
+        displayValue: '100 g',
       },
     ],
+  },
+]
+
+const groupsById = {
+  breakfast_silog232: {
+    name: 'Breakfast (Sample)',
+    mealIds: ['sinangag2023', 'itlog2023', 'longganisa_123', 'ensalada2023'],
+    totalProtein: null,
+    totalCalories: null,
+  },
+}
+
+const mealsById = {
+  sinangag2023: {
+    food: 'Garlic Fried Rice',
+    value: 200,
+    unit: 'g',
+    displayValue: '200 g',
+  },
+  itlog2023: {
+    food: 'Fried Egg',
+    value: 2,
+    unit: 'pcs',
+    displayValue: '2 pcs',
+  },
+  longganisa_123: {
+    food: 'Longganisa',
+    value: 3,
+    unit: 'pcs',
+    displayValue: '3 pcs',
+  },
+  ensalada2023: {
+    food: 'Pandesal',
+    value: 5,
+    unit: 'pcs',
+    displayValue: '5 pcs',
+  },
+}
+
+export const useFoodStore = create(
+  immer((set, get) => ({
     foodBank: {},
+    loggedFood: null,
 
     addFoodGroup: () =>
       set((state) => {
@@ -260,41 +298,8 @@ export const useFoodStore = create(
 export const useFoodStoreVersionTwo = create((set, get) => ({
   badNutritionResponses: [],
   foodGroups: ['breakfast_silog232'],
-  groupsById: {
-    breakfast_silog232: {
-      name: 'Breakfast (Sample)',
-      mealIds: ['sinangag2023', 'itlog2023', 'longganisa_123', 'ensalada2023'],
-      totalProtein: null,
-      totalCalories: null,
-    },
-  },
-  mealsById: {
-    sinangag2023: {
-      food: 'Garlic Fried Rice',
-      value: 200,
-      unit: 'g',
-      displayValue: '200 g',
-    },
-    itlog2023: {
-      food: 'Fried Egg',
-      value: 2,
-      unit: 'pcs',
-      displayValue: '2 pcs',
-    },
-    longganisa_123: {
-      food: 'Longganisa',
-      value: 3,
-      unit: 'pcs',
-      displayValue: '3 pcs',
-    },
-    ensalada2023: {
-      food: 'Pandesal',
-      value: 5,
-      unit: 'pcs',
-      displayValue: '5 pcs',
-    },
-  },
-
+  groupsById: {},
+  mealsById: {},
   foodBank: {},
 
   addFoodGroup: () =>
@@ -512,52 +517,6 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
       }
 
       const newFoodBank = { ...prev.foodBank }
-
-      // Expected format of foodObject
-      /*
-            const foodBank = {
-            egg: {
-                servings: {
-                piece: {
-                    quantity: 1,        // base unit = 1 piece
-                    calories: 75,       // macros for 1 piece
-                    protein: 6
-                },
-                gram: {
-                    quantity: 1,        // base unit = 1 gram
-                    calories: 1.5,      // macros per gram
-                    protein: 0.08
-                }
-                }
-            },
-            rice: {
-                servings: {
-                gram: {
-                    quantity: 1,        // base unit = 1 gram
-                    calories: 1.3,      // macros per gram
-                    protein: 0.025
-                },
-                cup: {
-                    quantity: 1,        // base unit = 1 cup
-                    calories: 200,
-                    protein: 4
-                }
-                }
-            }
-            }
-        */
-
-      // sample foodObject
-      /*
-        const sampleFoodObject = {
-            egg: {
-                serving: piece,
-                quantity: 1,
-                calories: 75,
-                protein: 7
-            }
-        }
-        */
 
       for (const food in foodObject) {
         const foodData = foodObject[food]

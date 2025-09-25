@@ -15,6 +15,16 @@ import AccountSetupNotice from '@/components/AccountSetupNotice'
 import Hero from '@/components/Hero'
 import Link from 'next/link'
 
+const title = 'Track what you ate today!'
+const description = (
+  <>
+    Type in the food you ate and the amount for each. We use the
+    <span className="text-primary font-medium"> Gemma-2 model </span> — a powerful AI from Google
+    DeepMind — running on Groq&apos;s LPU hardware to instantly calculate the calories and protein
+    for your meal.
+  </>
+)
+
 export default function Home() {
   const addFoodGroup = useFoodStoreVersionTwo((s) => s.addFoodGroup)
   const foodGroups = useFoodStoreVersionTwo((s) => s.foodGroups)
@@ -22,15 +32,6 @@ export default function Home() {
 
   devLog('foodGroups', foodGroups)
 
-  const title = 'Track what you ate today!'
-  const description = (
-    <>
-      Type in the food you ate and the amount for each. We use the
-      <span className="text-primary font-medium"> Gemma-2 model </span> — a powerful AI from Google
-      DeepMind — running on Groq&apos;s LPU hardware to instantly calculate the calories and protein
-      for your meal.
-    </>
-  )
   return (
     <DaisyThemeWrapper className="flex flex-col items-center space-y-6 p-6">
       <Hero title={title} description={description}>
