@@ -75,10 +75,12 @@ function MealTable({ groupId }) {
       layout
       className="bg-base-200 relative overflow-scroll rounded-md p-4"
     >
+      {/* Settings Icon */}
       <motion.div layout className="absolute top-6 right-2 -translate-y-1/2">
         <SettingsAction groupId={groupId} onEdit={() => setIsEditingHeader(true)} />
       </motion.div>
 
+      {/* Group Header */}
       <GroupHeader
         initialVal={groupName}
         setIsEditingHeader={setIsEditingHeader}
@@ -102,6 +104,8 @@ function MealTable({ groupId }) {
           handleToggleId={handleToggleId}
         />
       </TableStructure>
+
+      {/* Table Actions */}
 
       <div className="mt-4 flex justify-center gap-2">
         {deleteMode ? (
@@ -184,8 +188,6 @@ function TableStructure({ deleteMode, totalCalories, totalProtein, children }) {
   )
 }
 
-export default React.memo(MealTable)
-
 function GroupHeader({ initialVal, setIsEditingHeader, isEditingHeader, handleSave }) {
   const [localGroupName, setLocalGroupName] = React.useState(initialVal)
 
@@ -232,3 +234,5 @@ function GroupHeader({ initialVal, setIsEditingHeader, isEditingHeader, handleSa
     </motion.div>
   )
 }
+
+export default React.memo(MealTable)

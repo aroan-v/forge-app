@@ -2,7 +2,7 @@ import React from 'react'
 
 function Hero({ targetRef, color, title, description, children, isBig }) {
   return (
-    <div className="ds-hero" ref={targetRef}>
+    <section className="ds-hero" ref={targetRef}>
       <div className="ds-hero-content flex flex-col text-center">
         <div className="max-w-md">
           <h1
@@ -14,7 +14,7 @@ function Hero({ targetRef, color, title, description, children, isBig }) {
         </div>
         {children}
       </div>
-    </div>
+    </section>
   )
 }
 

@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
 import { nanoid } from 'nanoid'
 import { devError, devLog } from '@/lib/logger'
 import { produce } from 'immer'
@@ -75,225 +74,6 @@ const mealsById = {
     displayValue: '5 pcs',
   },
 }
-
-export const useFoodStore = create(
-  immer((set, get) => ({
-    foodBank: {},
-    loggedFood: null,
-
-    addFoodGroup: () =>
-      set((state) => {
-        state.loggedFood.push({
-          name: null,
-          id: nanoid(), // or use Date.now(), whatever you prefer
-          meals: [
-            {
-              food: null,
-              value: 0,
-              unit: '',
-              id: nanoid(),
-            },
-          ],
-        })
-      }),
-
-    deleteFoodGroup: (groupId) =>
-      set((state) => ({
-        loggedFood: state.loggedFood.filter(({ id }) => id !== groupId),
-      })),
-
-    addMealRow: (targetId) => {
-      set((state) => {
-        const targetGroup = state.loggedFood.find(({ id }) => id === targetId)
-        if (!targetGroup) return
-        targetGroup.meals.push({
-          food: null,
-          value: 0,
-          unit: '',
-          id: nanoid(),
-        })
-      })
-    },
-
-    deleteMealRow: ({ groupId, foodIds }) => {
-      set((state) => {
-        // Find the target group by groupId
-        const targetGroup = state.loggedFood.find((g) => g.id === groupId)
-
-        if (targetGroup) {
-          // ✅ Filter out all meals whose IDs are in foodIds
-          targetGroup.meals = targetGroup.meals.filter((meal) => !foodIds.includes(meal.id))
-        } else {
-          console.warn(`No group found with id ${groupId}`)
-        }
-      })
-    },
-
-    getUnregisteredFoods: () => {
-      const currentState = get()
-      const foodWithoutNutrition = {}
-
-      currentState.loggedFood.forEach(({ meals, id: groupId }) => {
-        meals.forEach((foodObj) => {
-          const { food, id: foodId, displayValue, protein, calories } = foodObj
-
-          if (food && foodId && displayValue && (protein == null || calories == null)) {
-            if (!foodWithoutNutrition[groupId]) {
-              foodWithoutNutrition[groupId] = {}
-            }
-
-            foodWithoutNutrition[groupId][foodId] = {
-              food,
-              displayValue,
-            }
-          }
-        })
-      })
-
-      return foodWithoutNutrition
-    },
-
-    updateGroupName: ({ groupId, groupName }) =>
-      set((state) => {
-        const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
-
-        if (targetGroup) {
-          targetGroup.name = groupName
-        }
-      }),
-
-    updateLoggedFoodName: ({ groupId, foodId, foodName, displayValue }) =>
-      set((state) => {
-        const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
-
-        if (targetGroup.meals) {
-          const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
-
-          if (targetMeal) {
-            if (foodName !== undefined) {
-              targetMeal.food = foodName ?? ''
-            }
-          } else {
-            console.warn('target meal not found')
-          }
-        } else {
-          console.warn('target group not found')
-        }
-      }),
-
-    updateLoggedFoodAmount: ({ groupId, foodId, displayValue }) =>
-      set((state) => {
-        const targetGroup = state.loggedFood.find(({ id }) => id === groupId)
-
-        if (targetGroup.meals) {
-          const targetMeal = targetGroup.meals.find(({ id }) => id === foodId)
-
-          if (targetMeal) {
-            if (displayValue !== undefined) {
-              targetMeal.displayValue = displayValue ?? ''
-            }
-          } else {
-            console.warn('target meal not found')
-          }
-        } else {
-          console.warn('target group not found')
-        }
-      }),
-
-    updateLoggedFoodWithNutrition: (nutritionData) =>
-      set((state) => {
-        state.loggedFood.forEach((groupMeal) => {
-          const enrichedGroup = nutritionData[groupMeal.id]
-          if (!enrichedGroup) return
-
-          groupMeal.meals.forEach((food) => {
-            const enriched = enrichedGroup[food.id]
-            if (!enriched) return
-
-            // ✅ Safe to mutate via Immer
-            food.calories = Number(enriched.calories)
-            food.protein = Number(enriched.protein)
-          })
-        })
-      }),
-
-    setFoodBank: (foodObject) =>
-      set((prev) => {
-        // guard clause: only allow non-null objects
-        if (!foodObject || typeof foodObject !== 'object' || Array.isArray(foodObject)) {
-          return prev
-        }
-
-        const newFoodBank = { ...prev.foodBank }
-
-        // Expected format of foodObject
-        /*
-            const foodBank = {
-            egg: {
-                servings: {
-                piece: {
-                    quantity: 1,        // base unit = 1 piece
-                    calories: 75,       // macros for 1 piece
-                    protein: 6
-                },
-                gram: {
-                    quantity: 1,        // base unit = 1 gram
-                    calories: 1.5,      // macros per gram
-                    protein: 0.08
-                }
-                }
-            },
-            rice: {
-                servings: {
-                gram: {
-                    quantity: 1,        // base unit = 1 gram
-                    calories: 1.3,      // macros per gram
-                    protein: 0.025
-                },
-                cup: {
-                    quantity: 1,        // base unit = 1 cup
-                    calories: 200,
-                    protein: 4
-                }
-                }
-            }
-            }
-        */
-
-        // sample foodObject
-        /*
-        const sampleFoodObject = {
-            egg: {
-                serving: piece,
-                quantity: 1,
-                calories: 75,
-                protein: 7
-            }
-        }
-        */
-
-        for (const food in foodObject) {
-          const foodData = foodObject[food]
-
-          if (!newFoodBank[food]) {
-            newFoodBank[food] = {
-              servings: {},
-            }
-          }
-
-          newFoodBank[food].servings[foodData.serving] = {
-            quantity: foodData.quantity,
-            calories: foodData.calories,
-            protein: foodData.protein,
-          }
-        }
-
-        return {
-          foodBank: newFoodBank,
-        }
-      }),
-  }))
-)
 
 export const useFoodStoreVersionTwo = create((set, get) => ({
   badNutritionResponses: [],
@@ -382,6 +162,16 @@ export const useFoodStoreVersionTwo = create((set, get) => ({
       })
     )
   },
+
+  setShallowState: (newData) =>
+    set((state) => {
+      devLog('setShallowState invoked')
+
+      return {
+        ...state,
+        ...newData,
+      }
+    }),
 
   saveToLocalStorage: () => {
     const state = get()

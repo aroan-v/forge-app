@@ -226,6 +226,7 @@
   &:is(:disabled, [disabled]),
   fieldset:disabled & {
     cursor: auto;
+    background: transparent;
     color: color-mix(
       in oklab,
       var(--color-base-content) /* var(--color-base-content) */ 100%,

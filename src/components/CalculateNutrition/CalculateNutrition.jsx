@@ -1,19 +1,17 @@
 'use client'
 import React from 'react'
-import { Button } from '../ui/button'
 import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
-import { Bot } from 'lucide-react'
 import { devLog } from '@/lib/logger'
 import { Card } from '../ui/card'
+import CalculateButton from '../CalculateButton'
 
 function CalculateNutrition({ ref }) {
-  const [content, setContent] = React.useState('') // holds any messages to show in UI
-  const [isLoading, setIsLoading] = React.useState(false) // tracks loading state
+  const [content, setContent] = React.useState('')
+  const [isLoading, setIsLoading] = React.useState(false)
   const [localUnregisteredFood, setLocalUnregisteredFood] = React.useState({})
   const [buttonDisabled, setButtonDisabled] = React.useState(false)
 
   const getUnregisteredFoods = useFoodStoreVersionTwo((s) => s.getUnregisteredFoods)
-  const badNutritionResponses = useFoodStoreVersionTwo((s) => s.badNutritionResponses)
   const saveToLocalStorage = useFoodStoreVersionTwo((s) => s.saveToLocalStorage)
 
   const updateLoggedFoodWithNutrition = useFoodStoreVersionTwo(
@@ -33,7 +31,6 @@ function CalculateNutrition({ ref }) {
   }, [content])
 
   devLog('localUnregisteredFood', localUnregisteredFood)
-  devLog('badNutritionResponses', badNutritionResponses)
 
   const fetchNutrition = async (unregisteredFoods) => {
     setIsLoading(true)
@@ -79,8 +76,6 @@ function CalculateNutrition({ ref }) {
     }
   }
 
-  const unregisteredFoods = { test: 'test' }
-
   const getLatestUnregisteredFoods = () => {
     const currentUnregisteredFood = getUnregisteredFoods()
     devLog('currentUnregisteredFood', currentUnregisteredFood)
@@ -93,66 +88,57 @@ function CalculateNutrition({ ref }) {
       setLocalUnregisteredFood(unregisteredFoodArray)
       setContent(`Getting data for ${unregisteredFoodArray.join(', ')}`)
       fetchNutrition(currentUnregisteredFood)
+    } else {
+      setContent('Please input your food and amount before trying to send to AI!')
     }
   }
 
   return (
     <div className="space-y-4 text-center">
-      {isLoading && <p className="text-muted-foreground text-sm">{content}</p>}
+      {isLoading && <p className="text-muted-foreground h-5 text-sm">{content}</p>}
 
-      {!isLoading && content && (
-        <pre className="text-sm font-medium whitespace-pre-wrap">{content}</pre>
-      )}
-
-      <Button
-        onClick={getLatestUnregisteredFoods}
-        disabled={isLoading || buttonDisabled}
-        variant="gradient"
-      >
-        <span className="relative z-10 flex gap-2 align-middle">
-          {isLoading ? 'Calculating…' : 'Calculate Nutrition with AI'}
-          {!isLoading && <Bot />}
-        </span>
-      </Button>
+      <CalculateButton onClick={getLatestUnregisteredFoods} disabled={isLoading || buttonDisabled}>
+        {isLoading ? 'Calculating…' : 'Calculate Nutrition with AI'}
+      </CalculateButton>
       <p className="text-muted-foreground text-xs">
         Powered by <code className="font-mono">gemma2-9b-it</code> on{' '}
         <code className="font-mono">groq</code>
       </p>
 
-      {badNutritionResponses.length > 0 && <BadResponsesSection data={badNutritionResponses} />}
-    </div>
-  )
-
-  return (
-    <div className="space-y-4">
-      <Button
-        onClick={fetchNutrition}
-        disabled={isLoading || Object.keys(unregisteredFoods).length === 0}
-      >
-        {isLoading ? 'Calculating…' : 'Calculate Nutrition'}
-      </Button>
-      {/* <Button onClick={fetchJustTheNutrition} disabled={isLoading}>
-        {isLoading ? 'Showing…' : 'Show Pending Nutrition Data'}
-      </Button> */}
-
-      {isLoading && <p className="text-sm text-gray-500">{content}</p>}
-      {!isLoading && content && (
-        <pre className="text-sm font-medium whitespace-pre-wrap">{content}</pre>
-      )}
+      <BadResponsesSection />
     </div>
   )
 }
 
 export default CalculateNutrition
 
-function BadResponsesSection({ data = [] }) {
-  devLog('badResponseData', data)
+function BadResponsesSection({}) {
+  const badNutritionResponses = useFoodStoreVersionTwo((s) => s.badNutritionResponses)
+  const setShallowState = useFoodStoreVersionTwo((s) => s.setShallowState)
+
+  React.useEffect(() => {
+    let timer
+    if (badNutritionResponses.length > 0) {
+      timer = setTimeout(() => {
+        setShallowState({
+          badNutritionResponses: [],
+        })
+      }, 5000)
+    }
+    return () => clearTimeout(timer)
+  }, [badNutritionResponses, setShallowState])
+
   return (
-    <Card>
-      <h4 className="font-bold">Skipped Foods</h4>
-      <p className="mt-1 text-sm">
-        Oops! Couldn’t read data for: {data.map((entry) => entry.food).join(', ')}
-      </p>
-    </Card>
+    <>
+      {badNutritionResponses.length > 0 && (
+        <Card className="border-2 border-red-400">
+          <h4 className="font-bold">Skipped Foods</h4>
+          <p className="mt-1 text-sm">
+            Oops! Couldn’t read data for:{' '}
+            {badNutritionResponses.map((entry) => entry.food).join(', ')}
+          </p>
+        </Card>
+      )}
+    </>
   )
 }
