@@ -1,7 +1,9 @@
+import { devLog } from '@/lib/logger'
 import React from 'react'
 import styled from 'styled-components'
 
 const CalculateButton = ({ disabled, onClick, children }) => {
+  devLog('disabled', disabled)
   return (
     <StyledWrapper>
       <button disabled={disabled} onClick={onClick} className="button">
@@ -66,6 +68,7 @@ const StyledWrapper = styled.div`
     transition: transform var(--transtion);
   }
 
+  /* Button Design */
   .button::before {
     content: '';
     position: absolute;
@@ -118,7 +121,7 @@ const StyledWrapper = styled.div`
     transform: scale(1);
   }
 
-  .button .dots_border {
+  .button:not(:disabled) .dots_border {
     --size_border: calc(100% + 5px);
 
     overflow: hidden;
@@ -136,7 +139,7 @@ const StyledWrapper = styled.div`
     z-index: -10;
   }
 
-  .button .dots_border::before {
+  .button:not(:disabled) .dots_border::before {
     content: '';
     position: absolute;
     top: 30%;
@@ -221,6 +224,38 @@ const StyledWrapper = styled.div`
     font-size: 1rem;
     font-weight: bold;
     color: white;
+  }
+
+  /* Disabled styles */
+
+  .button.disabled,
+  .button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(100%);
+    transform: none;
+  }
+
+  .button.disabled::before,
+  .button:disabled::before {
+    background-color: hsl(0 0% 30%);
+    box-shadow: none;
+  }
+
+  .button.disabled::after,
+  .button:disabled::after {
+    opacity: 0;
+  }
+
+  .button.disabled .sparkle,
+  .button:disabled .sparkle {
+    display: none;
+  }
+
+  .button.disabled .text_button,
+  .button:disabled .text_button {
+    color: hsl(0 0% 80%);
   }
 `
 

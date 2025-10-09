@@ -1,0 +1,1 @@
+export const groqModel = 'llama-3.1-8b-instant'

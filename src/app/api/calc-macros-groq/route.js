@@ -1,3 +1,4 @@
+import { groqModel } from '@/lib/groq-model'
 import { devLog } from '@/lib/logger'
 import { Groq } from 'groq-sdk'
 import { NextResponse } from 'next/server'
@@ -33,7 +34,7 @@ export async function POST(req) {
           content: JSON.stringify(body),
         },
       ],
-      model: 'gemma2-9b-it',
+      model: groqModel,
       temperature: 0.5,
       max_completion_tokens: 1024,
       top_p: 0.7,

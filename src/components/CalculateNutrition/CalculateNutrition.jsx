@@ -4,6 +4,7 @@ import { useFoodStoreVersionTwo } from '@/app/store/useFoodStore'
 import { devLog } from '@/lib/logger'
 import { Card } from '../ui/card'
 import CalculateButton from '../CalculateButton'
+import { groqModel } from '@/lib/groq-model'
 
 function CalculateNutrition({ ref }) {
   const [content, setContent] = React.useState('')
@@ -18,15 +19,20 @@ function CalculateNutrition({ ref }) {
     (s) => s.updateLoggedFoodWithNutrition
   )
 
+  const errorRef = React.useRef(null)
+
   // Auto clear content
   React.useEffect(() => {
     let timer
-    if (content) {
+
+    devLog('resetSignalRef.current', errorRef.current)
+    if (content && !errorRef.current) {
       timer = setTimeout(() => {
         setContent('')
         setButtonDisabled(false)
       }, 3000)
     }
+
     return () => clearTimeout(timer)
   }, [content])
 
@@ -63,8 +69,8 @@ function CalculateNutrition({ ref }) {
 
       setTimeout(() => setContent(''), 3000)
     } catch (err) {
-      console.error(err)
       setButtonDisabled(true)
+      errorRef.current = true
       setContent('❌ Error fetching nutrition data')
     } finally {
       setIsLoading(false)
@@ -95,13 +101,19 @@ function CalculateNutrition({ ref }) {
 
   return (
     <div className="space-y-4 text-center">
-      {isLoading && <p className="text-muted-foreground h-5 text-sm">{content}</p>}
+      {(isLoading || errorRef.current) && (
+        <p className="text-muted-foreground h-5 text-sm">{content}</p>
+      )}
 
       <CalculateButton onClick={getLatestUnregisteredFoods} disabled={isLoading || buttonDisabled}>
-        {isLoading ? 'Calculating…' : 'Calculate Nutrition with AI'}
+        {isLoading
+          ? 'Calculating…'
+          : errorRef.current
+            ? 'Model Deprecated'
+            : 'Calculate Nutrition with AI'}
       </CalculateButton>
       <p className="text-muted-foreground text-xs">
-        Powered by <code className="font-mono">gemma2-9b-it</code> on{' '}
+        Powered by <code className="font-mono">{groqModel}</code> on{' '}
         <code className="font-mono">groq</code>
       </p>
 
